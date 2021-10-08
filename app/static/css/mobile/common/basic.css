@@ -1,0 +1,37 @@
+
+/* 모바일 */
+@media (max-width: 500px) {
+    /* 로고 */
+    .logo {
+        height: 50px;
+    }
+
+    .top_logo_image {
+        margin-top: 5px;
+    }
+
+    /* 상단 */
+    .top_menu {
+        width: 100vw;
+    }
+
+    .li_top_menu {
+        font-size: 20px;
+        padding: 15px 20px;
+    }
+
+    .left_menu_image {
+        display: block;
+        position: fixed;
+        top: 10px;
+        right: 10px;
+    }
+
+    /* 하단 */
+    .left_menu {
+        display: none;
+        position: fixed;
+        top: 10px;
+        right: 10px;
+    }
+}

@@ -1,0 +1,10 @@
+
+<ul class="ul_left_menu">
+    {% if left_menu_list is not none %}
+        {% for left_menu in left_menu_list %}
+            <li class="li_left_menu" onclick="select_left_menu(this)">
+                {{ left_menu }}
+            </li>
+        {% endfor %}
+    {% endif %}
+</ul>

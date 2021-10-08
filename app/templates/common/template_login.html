@@ -1,0 +1,42 @@
+{% extends 'common/layout/layout_login.html' %}
+
+{% block js %}
+    <script type="text/javascript" src="/static/js/common/login.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="login_box">
+        <div class="login_wrap">
+            <div class="login_header">LOGIN</div>
+
+            {# 20210911 KYB mod 로그인 방식 변경 #}
+            {#
+            <div class="login_body">
+                <input class="login_text" type="text" name="userID" id="userID" autocomplete="off" placeholder="아이디">
+                <input class="login_text" type="password" name="userPW" id="userPW" autocomplete="off" placeholder="비밀번호">
+            </div>
+
+            <div class="login_footer">
+                <input class="login_button" type="button" value="로그인" id="loginBtn" onclick="login()">
+            </div>
+            #}
+            <form action="login/get_info" method="post" id="loginForm">
+                <div class="login_body">
+                    <input class="login_text" type="text" name="userID" id="userID" autocomplete="off" placeholder="아이디">
+                    <input class="login_text" type="password" name="userPW" id="userPW" autocomplete="off" placeholder="비밀번호" onkeyup="addEnterEvent(chkUserInfo)">
+                </div>
+
+                <div class="login_footer">
+                    <input class="login_button" type="button" value="로그인" id="loginBtn" onclick="chkUserInfo()">
+                    <div>
+                        <p id="loginResultText">
+                            {% if login_result_text %}
+                                {{ login_result_text }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>WE</title>
+
+    <script type="text/javascript" src="/static/js/common/top_menu.js"></script>
+    <script type="text/javascript" src="/static/js/common/left_menu.js"></script>
+    <script type="text/javascript" src="/static/js/common/basic.js"></script>
+    {% block js %}
+    {% endblock %}
+
+    <link rel="stylesheet" type="text/css" href="/static/css/common/basic.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/mobile/common/basic.css">
+    {% block css %}
+    {% endblock %}
+</head>
+<body>
+    <div class="root">
+        <div class="logo">
+            <img class="top_logo_image" src="/static/images/logo/top_logo.png" alt="logo image" onclick="getMainPage()">
+            <img class="left_menu_image" src="/static/images/icon/hamburger_menu.png" alt="menu icon">
+            {# 20210912 KYB add 로그아웃 버튼 추가 #}
+            <button class="logout_btn" onclick="logout()">로그아웃</button>
+        </div>
+
+        <div class="top">
+            <div class="top_menu">
+                {% include "common/tile/tile_topMenu.html" %}
+            </div>
+        </div>
+
+        <div class="bottom">
+            <div class="left_menu">
+                {% include "common/tile/tile_leftMenu.html" %}
+            </div>
+            <div class="content">
+                {% block content %}
+                    content
+                {% endblock %}
+            </div>
+            {# 20210916 KYB add 중앙에 맞추기 쉽게 하기 위해 right 추가 #}
+            <div class="right_menu">
+                
+            </div>
+        </div>
+
+        <div class="footer">
+
+        </div>
+    </div>
+</body>
+</html>

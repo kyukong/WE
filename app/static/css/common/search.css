@@ -1,0 +1,10 @@
+/* 20210913 KYB add 검색 화면에서 사용되는 클래스 */
+
+/* 페이징 처리 관련 */
+.page_wrap {
+    text-align: center;
+}
+
+.page_wrap li {
+    list-style: none;
+}

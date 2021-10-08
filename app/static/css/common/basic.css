@@ -1,0 +1,44 @@
+
+/* 전체 */
+body { margin: 0; }
+
+.root { display: flex; flex-direction: column; height: 100vh; }
+
+/* 로고 */
+.logo { background-color: black; color: white; height: 45px; text-align: center; }
+
+.top_logo_image { height: 40px; margin-top: 2.5px; cursor: pointer; }
+
+.left_menu_image { width: 30px; display: none; }
+
+.logout_btn { position: absolute; right: 6px; top: 6px; color: #4EC2A9; background-color: rgb(255, 255, 255, 0); padding: 5px 10px; border: #4EC2A9 1px solid; font-weight: bold; }
+/* .logout_btn:hover { color: #2CA389; } */
+.logout_btn:active { color: #2CA389; }
+
+/* 상단 */
+.top { height: 15vh; }
+
+.top_menu { width: 40vw; margin: auto; text-align: center; }
+
+.top_menu_wrap { padding-left: 0; margin: 0; height: 15vh; display: flex; justify-content: center; align-items: center; }
+.top_menu_wrap li { list-style: none; font-size: 25px; font-weight: bold; padding: 15px 30px; cursor: pointer; }
+.top_menu_wrap li:hover { color: gray; }
+.top_menu_wrap li.on { color: #4EC2A9; }
+
+/* 하단 */
+.bottom { flex: 1; display: flex; }
+
+.left_menu { width: 15vw; }
+
+.ul_left_menu { list-style: none; padding-left: 0; }
+
+.li_left_menu { padding: 15px 20px; font-weight: bold; font-size: 20px; }
+.li_left_menu:hover { background-color: black; color: white; }
+.li_left_menu.on { color: #4EC2A9; }
+.li_left_menu.on:hover { color: white; }
+
+.content { flex: 1; }
+
+.right_menu { width: 15vw; }
+
+.footer { width: 100%; height: 30px; }
