@@ -9,11 +9,6 @@ DB = {
     'charset': 'utf8'
 }
 
-# 이미지 경로 관련
-IMAGH_PATH = {
-    
-}
-
 # 검색 화면 관련
 SEARCH = {
     'SEARCH_RESULT_COUNT': 5,
