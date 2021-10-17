@@ -47,8 +47,8 @@ class APIWorkInsert(Resource):
         # 이력 아이디
         his_id = get_ID("HIS")
 
-        result = Work().ins_work_info(plan_insert_list, plan_update_list, plan_delete_list, 
-                work_insert_list, work_update_list, work_delete_list, his_id)
+        result = Work().ins_work_info(plan_insert_list, plan_update_list, plan_delete_list,
+                                      work_insert_list, work_update_list, work_delete_list, his_id)
 
         if result['result'] == 'fail':
             return {'result': 'fail'}

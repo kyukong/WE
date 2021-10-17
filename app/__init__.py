@@ -48,12 +48,10 @@ if __name__ == '__main__':
 
 # view
 from app.view.default.common import main
-# 20210911 KYB add 로그인 관련 view 추가
 from app.view.default.common import login
-# 20210913 KYB add 업무 관련 view 추가
 from app.view.default.work import work
-# 20211011 KYB add 보고서 관련 view 추가
 from app.view.default.work import work_report
 
 # api
 from app.view.API.work import api_work
+from app.view.API.work import api_workReport

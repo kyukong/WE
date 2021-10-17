@@ -2,6 +2,7 @@ from flask import g
 import pymysql
 from app.config import DB
 
+
 def connect():
     conn = pymysql.connect(
         host=DB['host'], 
@@ -16,18 +17,22 @@ def connect():
     g.conn = conn
     g.cursor = cursor
 
+
 def commit():
     conn = g.conn
     conn.commit()
+
 
 def rollback():
     conn = g.conn
     conn.rollback()
 
+
 def close():
     if hasattr(g, "conn"):
         conn = getattr(g, "conn")
         conn.close()
+
 
 def select(sql):
     result = dict()
@@ -48,6 +53,7 @@ def select(sql):
     finally:
         close()
         return result
+
 
 def insert(sql):
     result = dict()
@@ -79,6 +85,7 @@ def insert(sql):
         close()
         return result
 
+
 def update(sql):
     result = dict()
     result['result'] = 'fail'
@@ -108,6 +115,7 @@ def update(sql):
     finally:
         close()
         return result
+
 
 def delete(sql):
     result = dict()

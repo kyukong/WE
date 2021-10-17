@@ -3,10 +3,11 @@ from app.model.common.model_db_connect import select, insert, update, delete
 from app.config import DB, SEARCH
 
 
-class Work():
+class Work:
     
     # 20210913 KYB add 업무 정보 조회
-    def get_work_list(self, search_list):
+    @staticmethod
+    def get_work_list(search_list):
         '''
         업무 검색 화면에서 업무 리스트 정보 조회
         :param search_list: 검색어
@@ -89,8 +90,9 @@ class Work():
             return result
     
     # 20211004 KYB add 업무 등록
-    def ins_work_info(self, plan_insert_list, plan_update_list, plan_delete_list, 
-            work_insert_list, work_update_list, work_delete_list, his_id):
+    @staticmethod
+    def ins_work_info(plan_insert_list, plan_update_list, plan_delete_list,
+                      work_insert_list, work_update_list, work_delete_list, his_id):
         '''
         업무 상세정보 조회 화면에서 업무 등록
         :param 
@@ -102,6 +104,7 @@ class Work():
             sql = ""
             
             plan_sql = ""
+            # TODO KYB 계획 정보 관련 처리는 model_plan 파일로 이동
             # 계획 정보 등록
             if plan_insert_list:
                 plan_id_list = []
@@ -244,7 +247,8 @@ class Work():
             return result
     
     # 20211004 KYB add 계획 정보 조회
-    def get_plan_info(self, user_id, plan_start_date, plan_end_date=False):
+    @staticmethod
+    def get_plan_info(user_id, plan_start_date, plan_end_date=False):
         '''
         업무 상세정보 조회 화면에서 계획 정보 조회
         보고서 화면에서 계획 정보 조회
@@ -256,12 +260,12 @@ class Work():
         result = dict()
 
         try:
-            sql = ""
-            sql += f"SELECT PLAN_ID, IFNULL(PROJECT_ID, '') AS PROJECT_ID, IFNULL(PLAN_DATE, '') AS PLAN_DATE, "
-            sql += f"IFNULL(`USER_ID`, '') AS USER_ID, IFNULL(PLAN, '') AS PLAN, IFNULL(MEMO, '') AS MEMO, "
-            sql += f"INSERT_USER_ID, INSERT_DATETIME, UPDATE_USER_ID, UPDATE_DATETIME "
-            sql += f"FROM `tn_plan_info` "
-            sql += f"WHERE PLAN_DATE >= '{plan_start_date}' AND `USER_ID` = '{user_id}' "
+            sql: str = f"SELECT PLAN_ID, IFNULL(PROJECT_ID, '') AS PROJECT_ID, " \
+                       f"IFNULL(DATE_FORMAT(PLAN_DATE, '%Y-%m-%d'), '') AS PLAN_DATE, " \
+                       f"IFNULL(`USER_ID`, '') AS USER_ID, IFNULL(PLAN, '') AS PLAN, IFNULL(MEMO, '') AS MEMO, " \
+                       f"INSERT_USER_ID, INSERT_DATETIME, UPDATE_USER_ID, UPDATE_DATETIME " \
+                       f"FROM `tn_plan_info` " \
+                       f"WHERE PLAN_DATE >= '{plan_start_date}' AND `USER_ID` = '{user_id}' "
             if plan_end_date:
                 sql += f"AND PLAN_DATE <= '{plan_end_date}' "
             sql += f"ORDER BY INSERT_DATETIME; "
@@ -275,7 +279,8 @@ class Work():
             return result
 
     # 20211004 KYB add 업무 정보 조회
-    def get_work_info(self, user_id, work_start_date, work_end_date=False):
+    @staticmethod
+    def get_work_info(user_id, work_start_date, work_end_date=False):
         '''
         업무 상세정보 조회 화면에서 업무 정보 조회
         보고서 화면에서 업무 정보 조회
@@ -287,16 +292,16 @@ class Work():
         result = dict()
 
         try:
-            sql = ""
-            sql += f"SELECT WORK_ID, IFNULL(PROJECT_ID, '') AS PROJECT_ID, IFNULL(PLAN, '') AS PLAN, "
-            sql += f"IFNULL(WORK_STATE_CODE, '') AS WORK_STATE_CODE, "
-            sql += f"IFNULL(WORK_PROGRESS_CODE, '') AS WORK_PROGRESS_CODE, IFNULL(WORK_DATE, '') AS WORK_DATE, "
-            sql += f"IFNULL(`USER_ID`, '') AS USER_ID, IFNULL(WORK_CONTENT, '') AS WORK_CONTENT, "
-            sql += f"IFNULL(DELAY_CONTENT, '') AS DELAY_CONTENT, IFNULL(SOLUTION_CONTENT, '') AS SOLUTION_CONTENT, "
-            sql += f"IFNULL(MEMO, '') AS MEMO, IFNULL(FTP_PATH, '') AS FTP_PATH, "
-            sql += f"INSERT_USER_ID, INSERT_DATETIME, UPDATE_USER_ID, UPDATE_DATETIME "
-            sql += f"FROM `tn_work_info` "
-            sql += f"WHERE WORK_DATE >= '{work_start_date}' AND `USER_ID` = '{user_id}' "
+            sql: str = f"SELECT WORK_ID, IFNULL(PROJECT_ID, '') AS PROJECT_ID, IFNULL(PLAN, '') AS PLAN, " \
+                       f"IFNULL(WORK_STATE_CODE, '') AS WORK_STATE_CODE, " \
+                       f"IFNULL(WORK_PROGRESS_CODE, '') AS WORK_PROGRESS_CODE, " \
+                       f"IFNULL(DATE_FORMAT(WORK_DATE, '%Y-%m-%d'), '') AS WORK_DATE, " \
+                       f"IFNULL(`USER_ID`, '') AS USER_ID, IFNULL(WORK_CONTENT, '') AS WORK_CONTENT, " \
+                       f"IFNULL(DELAY_CONTENT, '') AS DELAY_CONTENT, IFNULL(SOLUTION_CONTENT, '') AS SOLUTION_CONTENT, " \
+                       f"IFNULL(MEMO, '') AS MEMO, IFNULL(FTP_PATH, '') AS FTP_PATH, " \
+                       f"INSERT_USER_ID, INSERT_DATETIME, UPDATE_USER_ID, UPDATE_DATETIME " \
+                       f"FROM `tn_work_info` " \
+                       f"WHERE WORK_DATE >= '{work_start_date}' AND `USER_ID` = '{user_id}' "
             if work_end_date:
                 sql += f"AND WORK_DATE <= '{work_end_date}' "
             sql += f"ORDER BY INSERT_DATETIME; "
@@ -308,8 +313,48 @@ class Work():
             result['data'] = ex
         finally:
             return result
-        
+
+    # 업무 상태값 수정
+    @staticmethod
+    def upd_work_state_info(work_id_list: list, work_state_code: str, user_id: str, his_id: str) -> dict:
+        '''
+        업무 상태값 및 시스템 정보 수정
+        :param work_id_list: 업무 ID 리스트
+        :param work_state_code: 저장할 업무 상태값
+        :param user_id: 사용자 ID
+        :param his_id: 이력 ID
+        :return: 성공 여부
+        '''
+        result: dict = dict()
+        try:
+            if not work_id_list:
+                return {'result': 'fail', 'data': 'work id list is empty.'}
+
+            sql: str = f"UPDATE tn_work_info " \
+                       f"SET WORK_STATE_CODE = '{work_state_code}', " \
+                       f"UPDATE_USER_ID = '{user_id}', UPDATE_DATETIME = now() " \
+                       f"WHERE WORK_ID = "
+
+            for i, work_id in enumerate(work_id_list):
+                sql += f"'{work_id}' "
+
+                if i != len(work_id_list) - 1:
+                    sql += f"OR WORK_ID = "
+                else:
+                    sql += f"; "
+
+            his_sql: str = Work().get_work_his_sql(work_id_list, his_id, 'UPDATE')
+            sql += his_sql
+
+            result = update(sql)
+        except Exception as ex:
+            result['result'] = 'fail'
+            result['data'] = ex
+        finally:
+            return result
+
     # 20211004 KYB add 계획 테이블 이력 sql 문 생성
+    @staticmethod
     def get_plan_his_sql(plan_id_list, his_id, action="INSERT"):
         his_sql = ""
         if not plan_id_list:
@@ -334,6 +379,7 @@ class Work():
         return his_sql
 
     # 20211004 KYB add 업무 테이블 이력 sql 문 생성
+    @staticmethod
     def get_work_his_sql(work_id_list, his_id, action="INSERT"):
         his_sql = ""
         if not work_id_list:

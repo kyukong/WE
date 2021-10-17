@@ -236,7 +236,6 @@ function getWorkInfo() {
         } else {
             planInsertInfoList.push(planInfo);
         }
-        
     }
 
     // 업무 정보 조회

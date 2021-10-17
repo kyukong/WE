@@ -101,6 +101,7 @@ def work_detail(day):
     else:
         plan_list = []
 
+    # TODO KYB 업무 상태 정보 확인하여 '보고' 인 것은 수정할 수 없도록 비활성화
     # 20211004 KYB add 업무 정보 조회
     work_list = Work().get_work_info(user_id, day)
     if work_list['result'] != 'fail':

@@ -1,8 +1,8 @@
 
-// 20211007 KYB add 삭제 리스트 추가
+// 삭제 리스트
 var planDeleteInfoList = [];
 
-// 20211013 KYB add 계획 일정 추가
+// 계획 정보 추가
 function getPlanTable() {
     var planTableDiv = document.getElementById('planTableDiv');
 
@@ -16,6 +16,12 @@ function getPlanTable() {
     html += '                    </colgroup>';
     html += '                </thead>';
     html += '                <tbody>';
+    html += '            <tr>';
+    html += '              <th>계획일자</th>';
+    html += '              <td>';
+    html += '                <input type="text" id="planDate" class="input_text">';
+    html += '              </td>';
+    html += '            </tr>';
     html += '                    <tr>';
     html += '                        <th>프로젝트명</th>';
     html += '                        <td>';
@@ -54,7 +60,7 @@ function getPlanTable() {
     setStringTag(planTableDiv, html);
 }
 
-// 20211002 KYB add 작성한 table 정보 삭제
+// 작성한 table 정보 삭제
 function delInfoTable(btn, infoType=false) {
     var deleteButtonElement = btn;
 
@@ -72,9 +78,101 @@ function delInfoTable(btn, infoType=false) {
     infoTable.remove();
 }
 
-// 보고서 등록 절차
-// 1. 금주 업무 정보들 상태값, 시스템값 변경
-// 2. 차주 계획 정보 저장
-// 3. 보고서 테이블에 저장
+// 보고서 등록하기 위해 보고서 정보 조회
+function getReportInfo() {
+    // 보고서 정보 조회
+    var reportDict = {};
 
-// 업무 상세조회에서 업무 상태값 확인하여 수정할 수 없도록 활성화
+    var registerDatetime = document.getElementById('REGISTER_DATETIME').value;
+    var paymentUserId = document.getElementById('PAYMENT_USER_ID').getAttribute('data-payment_user_id');
+
+    var thisweekStartDatetime = dayInfo['thisweek_start_day'];
+    var thisweekEndDatetime = dayInfo['thisweek_end_day'];
+    var nextweekStartDatetime = dayInfo['nextweek_start_day'];
+    var nextweekEndDatetime = dayInfo['nextweek_end_day'];
+
+    reportDict['registerDatetime'] = registerDatetime;
+    reportDict['paymentUserId'] = paymentUserId;
+    reportDict['thisweekStartDatetime'] = thisweekStartDatetime;
+    reportDict['thisweekEndDatetime'] = thisweekEndDatetime;
+    reportDict['nextweekStartDatetime'] = nextweekStartDatetime;
+    reportDict['nextweekEndDatetime'] = nextweekEndDatetime;
+
+    // 업무 정보 조회
+    var workIDList = [];
+    var workID;
+
+    var workTableDiv = document.getElementById('workTableDiv');
+
+    for (var i = 0; i < workTableDiv.childElementCount; i++) {
+        workID = workTableDiv.children[i].getAttribute('id');
+        workIDList.push(workID);
+    }
+
+    // 계획 정보 조회
+    var planInsertInfoList = [];
+    var planUpdateInfoList = [];
+    var planTableList = document.getElementById("planTableDiv").children;
+    var planTableInfo;
+
+    var planInfo = {};
+    var projectID, plan, memo, planOriFlag;
+
+    for (var i = 0; i < planTableList.length; i++) {
+        planInfo = {};
+        planTableInfo = planTableList[i];
+
+        planDate = planTableInfo.querySelector("#planDate").value.trim();
+
+        if (planDate === '') {
+            alert('계획일자를 입력해주세요.');
+            return;
+        }
+
+        projectID = planTableInfo.querySelector("#projectCode").value;
+        plan = planTableInfo.querySelector("#plan").value.trim();
+        memo = planTableInfo.querySelector("#memo").value.trim();
+
+        planInfo['projectID'] = projectID;
+        planInfo['planDay'] = planDate;
+        planInfo['plan'] = plan;
+        planInfo['memo'] = memo;
+        planInfo['planID'] = '';
+
+        planOriFlag = planTableInfo.getAttribute('data-oriflag');
+        if (planOriFlag == 'true') {
+            planInfo['planID'] = planTableInfo.getAttribute('id');
+
+            planUpdateInfoList.push(planInfo);
+        } else {
+            planInsertInfoList.push(planInfo);
+        }
+    }
+
+    getReportInsertAPI(reportDict, workIDList, planInsertInfoList, planUpdateInfoList, planDeleteInfoList);
+}
+
+// 보고서 등록 API 호출
+function getReportInsertAPI(reportDict, workIDList, planInsertInfoList, planUpdateInfoList, planDeleteInfoList) {
+    var url = '/api/v1/workReport/insert';
+    var body = {
+        'reportDict': reportDict,
+        'workIDList': workIDList,
+        'planInsertInfoList': planInsertInfoList,
+        'planUpdateInfoList': planUpdateInfoList,
+        'planDeleteInfoList': planDeleteInfoList,
+    };
+
+    getAPI(url, 'POST', body)
+        .then((result) => {
+            if (result['result'] != 'fail') {
+                var url = "/work/report/insert";
+                getPageGETMethod(url);
+            } else {
+                alert("보고서 저장에 실패하였습니다.");
+            }
+        })
+        .catch((error) => {
+            alert("api error: " + error);
+        })
+}
