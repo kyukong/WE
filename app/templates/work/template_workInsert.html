@@ -1,0 +1,330 @@
+{% extends 'common/layout/layout_basic.html' %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="/static/css/common/common.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/work/workInsert.css">
+{% endblock %}
+
+{% block js %}
+    <script>
+        var projectList = {{ project_list|tojson }};
+        var codeList = {{ code_list|tojson }};
+        var workDay = '{{ work_day }}';
+    </script>
+    <script type="text/javascript" src="/static/js/work/work.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div>
+        <p class="main_title">{{ work_day }}</p>
+    </div>
+
+    <!-- 계획 -->
+    <div>
+        <div>
+            <p class="sub_title">계획 일정<p>
+        </div>
+        <div>
+            <div id="planTableDiv">
+                {# 20211004 KYB add 작성한 계획이 있을 경우 계획 정보 추가 #}
+                {% if plan_list %}
+                    {% for plan_info in plan_list %}
+                        <table class="row_table" id="{{ plan_info['PLAN_ID'] }}" data-oriflag=true>
+                            <thead>
+                                <colgroup>
+                                    <col style="width: 20%">
+                                    <col style="width: 60%">
+                                    <col style="width: 20%">
+                                </colgroup>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>프로젝트명</th>
+                                    <td>
+                                        <label for="project_code"></label>
+                                        <select name="project_code" id="projectCode" class="input_select">
+                                            {% if project_list %}
+                                                {% for project_info in project_list %}
+                                                    {% if project_info['PROJECT_ID'] == plan_info['PROJECT_ID'] %}
+                                                        <option value="{{ project_info['PROJECT_ID'] }}" selected>{{ project_info['PROJECT_NAME'] }}</option>
+                                                    {% else %}
+                                                        <option value="{{ project_info['PROJECT_ID'] }}">{{ project_info['PROJECT_NAME'] }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </select>
+                                    </td>
+                                    <td rowspan="3">
+                                        <div class="center_column_button_wrap">
+                                            <input type="button" value="업무 등록" onclick="setPlanTable(this)">
+                                            <input type="button" value="계획 삭제" onclick="delInfoTable(this, 'plan')">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>계획</th>
+                                    <td>
+                                        <input type="text" id="plan" class="input_text" value="{{ plan_info['PLAN'] }}">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>비고</th>
+                                    <td>
+                                        <textarea type="text" id="memo" class="input_text" rows="3">{{ plan_info['MEMO'] }}</textarea>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    {% endfor %}
+                {# 20211004 KYB exp 이전에 작성한 계획 정보가 없을 경우 빈 테이블 추가 #}
+                {% else %}
+                    <table class="row_table" data-oriflag=false>
+                        <thead>
+                            <colgroup>
+                                <col style="width: 20%">
+                                <col style="width: 60%">
+                                <col style="width: 20%">
+                            </colgroup>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>프로젝트명</th>
+                                <td>
+                                    <label for="project_code"></label>
+                                    <select name="project_code" id="projectCode" class="input_select">
+                                        {% if project_list %}
+                                            {% for project_info in project_list %}
+                                                <option value="{{ project_info['PROJECT_ID'] }}">{{ project_info['PROJECT_NAME'] }}</option>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                </td>
+                                <td rowspan="3">
+                                    <div class="center_column_button_wrap">
+                                        <input type="button" value="업무 등록" onclick="setPlanTable(this)">
+                                        <input type="button" value="계획 삭제" onclick="delInfoTable(this, 'plan')">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>계획</th>
+                                <td>
+                                    <input type="text" id="plan" class="input_text">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>비고</th>
+                                <td>
+                                    <textarea type="text" id="memo" class="input_text" rows="3"></textarea>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+            <!-- 추가 버튼 -->
+            <div class="right_button_wrap">
+                <input type="button" value="추가" class="color_button" onclick="getPlanTable()">
+            </div>
+        </div>
+    </div>
+
+    <!-- 업무 -->
+    <div>
+        <div>
+            <p class="sub_title">업무 일정<p>
+        </div>
+        <div>
+            <!-- 업무 일정 -->
+            <div id="workTableDiv">
+                {# 20211004 KYB add 작성한 업무가 있을 경우 업무 정보 추가 #}
+                {% if work_list %}
+                    {% for work_info in work_list %}
+                        <table class="row_table" id="{{ work_info['WORK_ID'] }}" data-oriflag=true>
+                            <thead>
+                                <colgroup>
+                                    <col style="width: 20%">
+                                    <col style="width: 60%">
+                                    <col style="width: 20%">
+                                </colgroup>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>프로젝트명</th>
+                                    <td>
+                                        <label for="project_code"></label>
+                                        <select name="project_code" id="projectCode" class="input_select">
+                                            {% if project_list %}
+                                                {% for project_info in project_list %}
+                                                    {% if project_info['PROJECT_ID'] == work_info['PROJECT_ID'] %}
+                                                        <option value="{{ project_info['PROJECT_ID'] }}" selected>{{ project_info['PROJECT_NAME'] }}</option>
+                                                    {% else %}
+                                                        <option value="{{ project_info['PROJECT_ID'] }}">{{ project_info['PROJECT_NAME'] }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </select>
+                                    </td>
+                                    <td rowspan="6">
+                                        <div class="center_column_button_wrap">
+                                            <input type="button" value="업무 삭제" onclick="delInfoTable(this, 'work')">
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% if work_info['PLAN'] %}
+                                    <tr>
+                                {% else %}
+                                    <tr class="none">
+                                {% endif %}
+                                        <th>계획</th>
+                                        <td>
+                                            <input type="text" id="plan" class="input_text" value="{{ work_info['PLAN'] }}">
+                                        </td>
+                                    </tr>
+                                <tr>
+                                    <th>진행여부</th>
+                                    <td>
+                                        <label for="work_state_code"></label>
+                                        <select name="work_state_code" id="workStateCode" class="input_select">
+                                            {% if code_list['work_state_code_list'] %}
+                                                {% for work_state_code_info in code_list['work_state_code_list'] %}
+                                                    {% if work_state_code_info['CODE'] == work_info['WORK_PROGRESS_CODE'] %}
+                                                        <option value="{{ work_state_code_info['CODE'] }}" selected>{{ work_state_code_info['CODE_NAME'] }}</option>
+                                                    {% else %}
+                                                        <option value="{{ work_state_code_info['CODE'] }}">{{ work_state_code_info['CODE_NAME'] }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>진행사항</th>
+                                    <td>
+                                        <textarea type="text" id="workContent" class="input_text" rows="3">{{ work_info['WORK_CONTENT'] }}</textarea>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>지연사유</th>
+                                    <td>
+                                        <textarea type="text" id="delayContent" class="input_text" rows="3">{{ work_info['DELAY_CONTENT'] }}</textarea>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>해결방안</th>
+                                    <td>
+                                        <textarea type="text" id="solutionContent" class="input_text" rows="3">{{ work_info['SOLUTION_CONTENT'] }}</textarea>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>비고</th>
+                                    <td>
+                                        <textarea type="text" id="memo" class="input_text" rows="3">{{ work_info['MEMO'] }}</textarea>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>산출물 업로드 경로</th>
+                                    <td>
+                                        <input type="text" id="ftpPath" class="input_text" value="{{ work_info['FTP_PATH'] }}">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    {% endfor %}
+                {# 20211004 KYB exp 이전에 작성한 업무 정보가 없을 경우 빈 테이블 추가 #}
+                {% else %}
+                    <table class="row_table" data-oriflag=false>
+                        <thead>
+                            <colgroup>
+                                <col style="width: 20%">
+                                <col style="width: 60%">
+                                <col style="width: 20%">
+                            </colgroup>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>프로젝트명</th>
+                                <td>
+                                    <label for="project_code"></label>
+                                    <select name="project_code" id="projectCode" class="input_select">
+                                        {% if project_list %}
+                                            {% for project_info in project_list %}
+                                                <option value="{{ project_info['PROJECT_ID'] }}">{{ project_info['PROJECT_NAME'] }}</option>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                </td>
+                                <td rowspan="6">
+                                    <div class="center_column_button_wrap">
+                                        <input type="button" value="업무 삭제" onclick="delInfoTable(this, 'work')">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="none">
+                                <th>계획</th>
+                                <td>
+                                    <input type="text" id="plan" class="input_text" value="">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>진행여부</th>
+                                <td>
+                                    <label for="work_state_code"></label>
+                                    <select name="work_state_code" id="workStateCode" class="input_select">
+                                        {% if code_list['work_state_code_list'] %}
+                                            {% for work_state_code_info in code_list['work_state_code_list'] %}
+                                                <option value="{{ work_state_code_info['CODE'] }}">{{ work_state_code_info['CODE_NAME'] }}</option>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>진행사항</th>
+                                <td>
+                                    <textarea type="text" id="workContent" class="input_text" rows="3"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>지연사유</th>
+                                <td>
+                                    <textarea type="text" id="delayContent" class="input_text" rows="3"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>해결방안</th>
+                                <td>
+                                    <textarea type="text" id="solutionContent" class="input_text" rows="3"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>비고</th>
+                                <td>
+                                    <textarea type="text" id="memo" class="input_text" rows="3"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>산출물 업로드 경로</th>
+                                <td>
+                                    <input type="text" id="ftpPath" class="input_text">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+            <!-- 추가 버튼 -->
+            <div class="right_button_wrap">
+                <input type="button" value="추가" class="color_button" onclick="getWorkTable()">
+            </div>
+        </div>
+    </div>
+
+    <!-- 업무 등록 -->
+    <div>
+        <div class="center_button_wrap">
+            <input type="button" value="업무 저장" class="empty_button" onclick="getWorkInfo()">
+        </div>
+    </div>
+
+{% endblock %}

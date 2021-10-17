@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>WE</title>
+
+    <script type="text/javascript" src="/static/js/common/top_menu.js"></script>
+    <script type="text/javascript" src="/static/js/common/left_menu.js"></script>
+    <script type="text/javascript" src="/static/js/common/basic.js"></script>
+    {% block js %}
+    {% endblock %}
+
+    <link rel="stylesheet" type="text/css" href="/static/css/common/basic.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/mobile/common/basic.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/common/login.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/mobile/common/login.css">
+    {% block css %}
+    {% endblock %}
+</head>
+<body>
+    <div class="root">
+        <div class="logo">
+            <img class="top_logo_image" src="/static/images/logo/top_logo.png" alt="logo image" onclick="getLoginPage()">
+        </div>
+
+        <div class="bottom">
+            <div class="content">
+                {% block content %}
+                {% endblock %}
+            </div>    
+        </div>
+    </div>
+</body>
+</html>

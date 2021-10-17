@@ -1,0 +1,14 @@
+<div class="left_menu_wrap">
+    <ul>
+        {% if menu_list %}
+            {% for left_menu in menu_list %}
+                {% if left_menu['MENU_LEVEL'] == 1 and left_menu['HIGHCODE'] == now_top_menu_code %}
+                    <li onclick="getLeftMenuPage(this)" data-url="{{ left_menu['PATH'] }}"
+                    {% if now_left_menu_code == left_menu['CODE'] %}class="on"{% endif %}>
+                        {{ left_menu['MENU_NAME'] }}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </ul>
+</div>

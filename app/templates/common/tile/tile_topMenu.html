@@ -1,0 +1,14 @@
+<div class="top_menu_wrap">
+    <ul>
+        {% if menu_list %}
+            {% for top_menu in menu_list %}
+                {% if top_menu['MENU_LEVEL'] == 0 %}
+                    <li onclick="getTopMenuPage(this)" data-url="{{ top_menu['PATH'] }}"
+                    {% if now_top_menu_code == top_menu['CODE'] %}class="on"{% endif %}>
+                        {{ top_menu['MENU_NAME'] }}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </ul>
+</div>

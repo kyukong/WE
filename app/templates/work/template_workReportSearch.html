@@ -1,0 +1,127 @@
+{% extends '/common/layout/layout_basic.html' %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="/static/css/common/common.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/common/search.css">
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript" src="/static/js/work/workReportSearch.js"></script>
+{% endblock %}
+
+{% block content %}
+    <!-- 검색 조건 -->
+    <div>
+        <p class="main_title">보고서 검색<p>
+    </div>
+    
+    <div>
+        <table class="row_table">
+            <thead>
+                <colgroup>
+                    <col style="width: 20%;">
+                    <col style="width: 30%;">
+                    <col style="width: 20%;">
+                    <col style="width: 30%;">
+                </colgroup>
+            </thead>
+            <tbody>
+                <tr>
+                    <!-- TODO 20211011 KYB 등록일자에 캘린더 추가 -->
+                    <th>등록 일자</th>
+                    <td colspan="3">
+                        <input id="searchStartReportDate" type="text" class="input_text datetime">
+                        ~
+                        <input id="searchEndReportDate" type="text" class="input_text datetime">
+                    </td>
+                </tr>
+                <tr>
+                    <th>보고서 상태</th>
+                    <td>
+                        <label for="report_state_code"></label>
+                        <select id="searchReportStateCode" name="report_state_code" class="input_select">
+                            {% if report_state_list %}
+                                {% for report_state_info in report_state_list %}
+                                    {#
+                                    {% if search_list['search_project_code'] == project_info['PROJECT_ID'] %}
+                                        <option selected value="{{ project_info['PROJECT_ID'] }}">{{ project_info['PROJECT_NAME'] }}</option>
+                                    {% else %}
+                                    #}
+                                        <option value="{{ report_state_info['CODE'] }}">{{ report_state_info['CODE_NAME'] }}</option>
+                                    {#
+                                    {% endif %}
+                                    #}
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </td>
+                    <th>작성자</th>
+                    <td>
+                        <input id="searchReportUserName" type="text" class="input_text">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- 검색 버튼 -->
+    <div class="center_button_wrap">
+        <input type="button" value="검색" class="color_button" onclick="getSearchWorkReportList()">
+    </div>
+
+    <!-- 검색 결과 -->
+    <div>
+        <p class="sub_title">검색결과({{ report_total_count }})<p>
+        <table class="col_table">
+            <thead>
+                <colgroup>
+                    <col style="width: 25%">
+                    <col style="width: 25%">
+                    <col style="width: 25%">
+                    <col style="width: 25%">
+                </colgroup>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>보고일자</th>
+                    <th>등록일자</th>
+                    <th>작성자</th>
+                    <th>보고서 상태</th>
+                </tr>
+                {% if report_list %}
+                    {% for report_info in report_list %}
+                        <tr onclick="getWorkDetailPage(this)" id="{{ report_info['REPORT_ID'] }}">
+                            <td>
+                                {% if report_info['THISWEEK_START_DATETIME'] %}
+                                    {% if report_info['THISWEEK_END_DATETIME'] %}
+                                        {{ report_info['THISWEEK_START_DATETIME'] }} ~ {{ report_info['THISWEEK_END_DATETIME'] }}
+                                    {% else %}
+                                        {{ report_info['THISWEEK_START_DATETIME'] }}
+                                    {% endif %}
+                                {% else %}
+                                    {{ report_info['THISWEEK_END_DATETIME'] }}
+                                {% endif %}
+                            </td>
+                            <td>{{ report_info['REGISTER_DATETIME'] }}</td>
+                            <td>{{ report_info['USER_NAME'] }}</td>
+                            <td>{{ report_info['PAYMENT_PROGRESS_CODE_NAME'] }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 페이징 처리 -->
+    <div class="page_wrap">
+        <ul>
+            {% for page in range(page_info['first_page'], page_info['last_page'] + 1) %}
+                {% if page == page_info['page'] %}
+                    <li class="on">{{ page }}</li>
+                {% else %}
+                    <li onclick="getPageWorkReportList(this)">{{ page }}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+
+{% endblock %}

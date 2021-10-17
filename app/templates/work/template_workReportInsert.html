@@ -1,10 +1,217 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends '/common/layout/layout_basic.html' %}
+
+{% block css %}
+  <link rel="stylesheet" type="text/css" href="/static/css/common/common.css">
+{% endblock %}
+
+{% block js %}
+  <script>
+    var projectList = {{ project_list|tojson }};
+<!--    var codeList = {{ code_list|tojson }};-->
+<!--    var workDay = '{{ work_day }}';-->
+  </script>
+  <script type="text/javascript" src="/static/js/work/workReportInsert.js"></script>
+{% endblock %}
+
+{% block content %}
+  <div>
+    <div>
+      <table class="row_table" id="reportBasicTable">
+        <colgroup>
+          <col style="width: 25%">
+          <col style="width: 25%">
+          <col style="width: 25%">
+          <col style="width: 25%">
+        </colgroup>
+        <tbody>
+          <tr>
+            <th>등록일자</th>
+            <td>{{ day_info['today'] }}</td>
+            <th >보고서 상태</th>
+            <td>{{ code_list['payment_progress_code'] }}</td>
+          </tr>
+          <tr>
+            <th>작성자</th>
+            <td>{{ user_name }}</td>
+            <td colspan="2"></td>
+          </tr>
+          <tr>
+            <th>결재자</th>
+            <td>{{ payment_dict['payment_user_name'] }}</td>
+            <th>결재일자</th>
+            <td></td>
+          </tr>
+          <tr class="none">
+            <th>반려내용</th>
+            <td colspan="3"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div>
+    <p class="main_title">
+      금주 업무 ({{ day_info['thisweek_start_day'] }} ~ {{ day_info['thisweek_end_day'] }})
+    <p>
+  </div>
+  <div id="workTableDiv">
+    {% if work_list %}
+      {% for work_info in work_list %}
+        <table class="row_table" id="{{ work_info['WORK_ID'] }}" data-oriflag=true>
+          <colgroup>
+            <col style="width: 20%">
+            <col style="width: 60%">
+          </colgroup>
+          <tbody>
+          <tr>
+            <th>프로젝트명</th>
+            <td>
+              <label for="project_code"></label>
+              <select name="project_code" id="projectCode" class="input_select" disabled>
+                {% if project_list %}
+                  {% for project_info in project_list %}
+                    {% if project_info['PROJECT_ID'] == work_info['PROJECT_ID'] %}
+                      <option value="{{ project_info['PROJECT_ID'] }}" selected>{{ project_info['PROJECT_NAME'] }}</option>
+                    {% else %}
+                      <option value="{{ project_info['PROJECT_ID'] }}">{{ project_info['PROJECT_NAME'] }}</option>
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+              </select>
+            </td>
+          </tr>
+          {% if work_info['PLAN'] %}
+            <tr>
+          {% else %}
+            <tr class="none">
+          {% endif %}
+            <th>계획</th>
+            <td>
+              <input type="text" id="plan" class="input_text" value="{{ work_info['PLAN'] }}" readonly>
+            </td>
+          </tr>
+          <tr>
+            <th>진행여부</th>
+            <td>
+              <label for="work_state_code"></label>
+              <select name="work_state_code" id="workStateCode" class="input_select" disabled>
+                {% if code_list['work_state_code_list'] %}
+                  {% for work_state_code_info in code_list['work_state_code_list'] %}
+                    {% if work_state_code_info['CODE'] == work_info['WORK_PROGRESS_CODE'] %}
+                      <option value="{{ work_state_code_info['CODE'] }}" selected>{{ work_state_code_info['CODE_NAME'] }}</option>
+                    {% else %}
+                      <option value="{{ work_state_code_info['CODE'] }}">{{ work_state_code_info['CODE_NAME'] }}</option>
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <th>진행사항</th>
+            <td>
+              <textarea id="workContent" class="input_text" rows="3" readonly>{{ work_info['WORK_CONTENT'] }}</textarea>
+            </td>
+          </tr>
+          <tr>
+            <th>지연사유</th>
+            <td>
+              <textarea id="delayContent" class="input_text"
+                        rows="3" readonly>{{ work_info['DELAY_CONTENT'] }}</textarea>
+            </td>
+          </tr>
+          <tr>
+            <th>해결방안</th>
+            <td>
+              <textarea id="solutionContent" class="input_text"
+                        rows="3" readonly>{{ work_info['SOLUTION_CONTENT'] }}</textarea>
+            </td>
+          </tr>
+          <tr>
+            <th>비고</th>
+            <td>
+              <textarea id="memo" class="input_text" rows="3" readonly>{{ work_info['MEMO'] }}</textarea>
+            </td>
+          </tr>
+          <tr>
+            <th>산출물 업로드 경로</th>
+            <td>
+              <input type="text" id="ftpPath" class="input_text" value="{{ work_info['FTP_PATH'] }}" readonly>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <div>
+    <p class="main_title">
+      차주 계획 ({{ day_info['nextweek_start_day'] }} ~ {{ day_info['nextweek_end_day'] }})
+    <p>
+  </div>
+  <div>
+    <div id="planTableDiv">
+      {% if plan_list %}
+        {% for plan_info in plan_list %}
+          <table class="row_table" id="{{ plan_info['PLAN_ID'] }}" data-oriflag=true>
+            <thead>
+            <colgroup>
+              <col style="width: 20%">
+              <col style="width: 60%">
+              <col style="width: 20%">
+            </colgroup>
+            </thead>
+            <tbody>
+            <tr>
+              <th>프로젝트명</th>
+              <td>
+                <label for="project_code"></label>
+                <select name="project_code" id="projectCode" class="input_select">
+                  {% if project_list %}
+                    {% for project_info in project_list %}
+                      {% if project_info['PROJECT_ID'] == plan_info['PROJECT_ID'] %}
+                        <option value="{{ project_info['PROJECT_ID'] }}" selected>{{ project_info['PROJECT_NAME'] }}</option>
+                      {% else %}
+                        <option value="{{ project_info['PROJECT_ID'] }}">{{ project_info['PROJECT_NAME'] }}</option>
+                      {% endif %}
+                    {% endfor %}
+                  {% endif %}
+                </select>
+              </td>
+              <td rowspan="3">
+                <div class="center_column_button_wrap">
+                  <input type="button" value="계획 삭제" onclick="delInfoTable(this, 'plan')">
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>계획</th>
+              <td>
+                <input type="text" id="plan" class="input_text" value="{{ plan_info['PLAN'] }}">
+              </td>
+            </tr>
+            <tr>
+              <th>비고</th>
+              <td>
+                <textarea type="text" id="memo" class="input_text" rows="3">{{ plan_info['MEMO'] }}</textarea>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <!-- 추가 버튼 -->
+    <div class="right_button_wrap">
+      <input type="button" value="추가" class="color_button" onclick="getPlanTable()">
+    </div>
+  </div>
+
+  <!-- 보고서 등록 -->
+  <div>
+    <div class="center_button_wrap">
+      <input type="button" value="보고서 저장" class="empty_button" onclick="getWorkInfo()">
+    </div>
+  </div>
+{% endblock %}
