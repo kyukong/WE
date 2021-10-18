@@ -82,30 +82,101 @@ def work_report_insert():
     now_top_menu_code = 'MENWRK'
     now_left_menu_code = 'MENWRK003'
 
+    # 날짜 관련
+    day_dict: dict = get_date_info()
+
+    # 코드 관련
+    code_dict: dict = get_report_code_info()
+
+    # 보고서 관련
+    report_dict: dict = dict()
+
+    # 주간보고서 정보 조회
+    # TODO 주간보고서 존재 여부 확인 방법 변경(-> 사용자 테이블에서 금주 보고서 아이디 확인)
+    thisweek_report_dict: dict = Report().get_thisweek_report_info(user_id, day_dict['thisweek_start_day'])
+    # 이전에 작성한 금주 주간보고서가 존재할 경우
+    if thisweek_report_dict['result'] != 'fail' and thisweek_report_dict['data']:
+        thisweek_report_info: dict = thisweek_report_dict['data'][0]
+        report_id: str = thisweek_report_info['REPORT_ID']
+        payment_progress_code: str = thisweek_report_info['PAYMENT_PROGRESS_CODE']
+        payment_progress_code_name: str = thisweek_report_info['PAYMENT_PROGRESS_CODE_NAME']
+        payment_user_id: str = thisweek_report_info['PAYMENT_USER_ID']
+        payment_user_name: str = thisweek_report_info['PAYMENT_USER_NAME']
+
+    # 이전에 작성한 금주 주간보고서가 없을 경우
+    else:
+        report_id: str = ''
+        payment_progress_code: str = 'RPS0001'
+        payment_progress_code_name: str = '작성중'
+
+        # 결재자 정보 조회
+        user_dict: dict = User().get_user_info(user_id)
+        if user_dict['result'] != 'fail' and user_dict['count'] != 0:
+            user_dict = user_dict['data'][0]
+            payment_user_id: str = user_dict['PAYMENT_USER_ID']
+            payment_user_name: str = user_dict['PAYMENT_USER_NAME']
+        else:
+            payment_user_id: str = ''
+            payment_user_name: str = ''
+
+    report_dict['report_id'] = report_id
+    report_dict['payment_progress_code'] = payment_progress_code
+    report_dict['payment_progress_code_name'] = payment_progress_code_name
+    report_dict['payment_user_id'] = payment_user_id
+    report_dict['payment_user_name'] = payment_user_name
+
+    # 금주 일정 조회
+    work_list = Work().get_work_info(user_id, day_dict['thisweek_start_day'], day_dict['thisweek_end_day'])
+    if work_list['result'] != 'fail':
+        work_list = work_list['data']
+    else:
+        work_list = []
+
+    # 차주 계획 조회
+    plan_list = Work().get_plan_info(user_id, day_dict['nextweek_start_day'], day_dict['nextweek_end_day'])
+    if plan_list['result'] != 'fail':
+        plan_list = plan_list['data']
+    else:
+        plan_list = []
+
+    return render_template('/work/template_workReportInsert.html', menu_list=menu_list,
+                           now_top_menu_code=now_top_menu_code, now_left_menu_code=now_left_menu_code,
+                           user_name=user_name, day_dict=day_dict, work_list=work_list,
+                           code_dict=code_dict, report_dict=report_dict,
+                           plan_list=plan_list)
+
+
+# 보고서 날짜 정보 조회
+def get_date_info() -> dict:
     # 보고서 등록 일자 조회
-    today_datetime = datetime.today()
-    today = today_datetime.strftime("%Y-%m-%d")
-    weekday = today_datetime.weekday()
+    today_datetime: datetime = datetime.today()
+    today: str = today_datetime.strftime("%Y-%m-%d")
+    weekday: int = today_datetime.weekday()
 
     # 금주 날짜 계산
-    thisweek_start_datetime = today_datetime - timedelta(days=weekday)
-    thisweek_start_day = thisweek_start_datetime.strftime("%Y-%m-%d")
-    thisweek_end_datetime = today_datetime + timedelta(days=(4 - weekday))
-    thisweek_end_day = thisweek_end_datetime.strftime("%Y-%m-%d")
+    thisweek_start_datetime: datetime = today_datetime - timedelta(days=weekday)
+    thisweek_start_day: str = thisweek_start_datetime.strftime("%Y-%m-%d")
+    thisweek_end_datetime: datetime = today_datetime + timedelta(days=(4 - weekday))
+    thisweek_end_day: str = thisweek_end_datetime.strftime("%Y-%m-%d")
 
     # 차주 날짜 계산
-    nextweek_start_datetime = thisweek_start_datetime + timedelta(days=7)
-    nextweek_start_day = nextweek_start_datetime.strftime("%Y-%m-%d")
-    nextweek_end_datetime = thisweek_end_datetime + timedelta(days=7)
-    nextweek_end_day = nextweek_end_datetime.strftime("%Y-%m-%d")
+    nextweek_start_datetime: datetime = thisweek_start_datetime + timedelta(days=7)
+    nextweek_start_day: str = nextweek_start_datetime.strftime("%Y-%m-%d")
+    nextweek_end_datetime: datetime = thisweek_end_datetime + timedelta(days=7)
+    nextweek_end_day: str = nextweek_end_datetime.strftime("%Y-%m-%d")
 
-    day_info = dict()
-    day_info['today'] = today
-    day_info['thisweek_start_day'] = thisweek_start_day
-    day_info['thisweek_end_day'] = thisweek_end_day
-    day_info['nextweek_start_day'] = nextweek_start_day
-    day_info['nextweek_end_day'] = nextweek_end_day
+    day_dict: dict = dict()
+    day_dict['today'] = today
+    day_dict['thisweek_start_day'] = thisweek_start_day
+    day_dict['thisweek_end_day'] = thisweek_end_day
+    day_dict['nextweek_start_day'] = nextweek_start_day
+    day_dict['nextweek_end_day'] = nextweek_end_day
 
+    return day_dict
+
+
+# 보고서 관련 코드 정보 조회
+def get_report_code_info() -> dict:
     # 프로젝트명 코드 조회
     project_list = Project().get_project_info()
     if project_list['result'] != 'fail' and project_list['count'] != 0:
@@ -120,45 +191,8 @@ def work_report_insert():
     else:
         work_state_code_list = []
 
-    # 결재자 정보 조회
-    user_dict: dict = User().get_user_info(user_id)
-    if user_dict['result'] != 'fail' and user_dict['count'] != 0:
-        user_dict = user_dict['data'][0]
-        payment_user_name: str = user_dict['PAYMENT_USER_NAME']
-    else:
-        user_dict: list = []
-        payment_user_name: str = ''
+    code_dict: dict = dict()
+    code_dict['project_list']: list = project_list
+    code_dict['work_state_code_list']: list = work_state_code_list
 
-    payment_dict: dict = dict()
-    payment_dict['payment_user_name']: str = payment_user_name
-
-    # 보고서 상태
-    payment_progress_code_dict: dict = Code().get_code_name('RPS0001')
-    if payment_progress_code_dict['result'] != 'fail' and payment_progress_code_dict['count'] != 0:
-        payment_progress_code: str = payment_progress_code_dict['data'][0]['CODE_NAME']
-    else:
-        payment_progress_code: str = ''
-
-    code_list: dict = dict()
-    code_list['work_state_code_list']: list = work_state_code_list
-    code_list['payment_progress_code']: str = payment_progress_code
-
-    # 금주 일정 조회
-    work_list = Work().get_work_info(user_id, thisweek_start_day, thisweek_end_day)
-    if work_list['result'] != 'fail':
-        work_list = work_list['data']
-    else:
-        work_list = []
-
-    # 차주 계획 조회
-    plan_list = Work().get_plan_info(user_id, nextweek_start_day, nextweek_end_day)
-    if plan_list['result'] != 'fail':
-        plan_list = plan_list['data']
-    else:
-        plan_list = []
-
-    return render_template('/work/template_workReportInsert.html', menu_list=menu_list,
-                           now_top_menu_code=now_top_menu_code, now_left_menu_code=now_left_menu_code,
-                           user_name=user_name, day_info=day_info, work_list=work_list,
-                           project_list=project_list, code_list=code_list,
-                           plan_list=plan_list, payment_dict=payment_dict, user_dict=user_dict)
+    return code_dict

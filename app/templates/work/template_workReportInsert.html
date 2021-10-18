@@ -6,10 +6,9 @@
 
 {% block js %}
   <script>
-    var projectList = {{ project_list|tojson }};
-    var dayInfo = {{ day_info|tojson }};
-<!--    var codeList = {{ code_list|tojson }};-->
-<!--    var workDay = '{{ work_day }}';-->
+    var reportID = '{{ report_dict['report_id'] }}';
+    var projectList = {{ code_dict['project_list']|tojson }};
+    var dayInfo = {{ day_dict|tojson }};
   </script>
   <script type="text/javascript" src="/static/js/work/workReportInsert.js"></script>
 {% endblock %}
@@ -27,9 +26,9 @@
         <tbody>
           <tr>
             <th>등록일자</th>
-            <td id="REGISTER_DATETIME">{{ day_info['today'] }}</td>
+            <td id="REGISTER_DATETIME">{{ day_dict['today'] }}</td>
             <th>보고서 상태</th>
-            <td id="PAYMENT_PROGRESS_CODE">{{ code_list['payment_progress_code'] }}</td>
+            <td id="PAYMENT_PROGRESS_CODE">{{ report_dict['payment_progress_code_name'] }}</td>
           </tr>
           <tr>
             <th>작성자</th>
@@ -38,7 +37,7 @@
           </tr>
           <tr>
             <th>결재자</th>
-            <td id="PAYMENT_USER_ID" data-payment_user_id="{{ user_dict['PAYMENT_USER_ID'] }}">{{ payment_dict['payment_user_name'] }}</td>
+            <td id="PAYMENT_USER_ID" data-payment_user_id="{{ report_dict['payment_user_id'] }}">{{ report_dict['payment_user_name'] }}</td>
             <th>결재일자</th>
             <td></td>
           </tr>
@@ -52,7 +51,7 @@
   </div>
   <div>
     <p class="main_title">
-      금주 업무 ({{ day_info['thisweek_start_day'] }} ~ {{ day_info['thisweek_end_day'] }})
+      금주 업무 ({{ day_dict['thisweek_start_day'] }} ~ {{ day_dict['thisweek_end_day'] }})
     <p>
   </div>
   <div id="workTableDiv">
@@ -75,8 +74,8 @@
             <td>
               <label for="project_code"></label>
               <select name="project_code" id="projectCode" class="input_select" disabled>
-                {% if project_list %}
-                  {% for project_info in project_list %}
+                {% if code_dict['project_list'] %}
+                  {% for project_info in code_dict['project_list'] %}
                     {% if project_info['PROJECT_ID'] == work_info['PROJECT_ID'] %}
                       <option value="{{ project_info['PROJECT_ID'] }}" selected>{{ project_info['PROJECT_NAME'] }}</option>
                     {% else %}
@@ -102,8 +101,8 @@
             <td>
               <label for="work_state_code"></label>
               <select name="work_state_code" id="workStateCode" class="input_select" disabled>
-                {% if code_list['work_state_code_list'] %}
-                  {% for work_state_code_info in code_list['work_state_code_list'] %}
+                {% if code_dict['work_state_code_dict'] %}
+                  {% for work_state_code_info in code_dict['work_state_code_list'] %}
                     {% if work_state_code_info['CODE'] == work_info['WORK_PROGRESS_CODE'] %}
                       <option value="{{ work_state_code_info['CODE'] }}" selected>{{ work_state_code_info['CODE_NAME'] }}</option>
                     {% else %}
@@ -154,7 +153,7 @@
 
   <div>
     <p class="main_title">
-      차주 계획 ({{ day_info['nextweek_start_day'] }} ~ {{ day_info['nextweek_end_day'] }})
+      차주 계획 ({{ day_dict['nextweek_start_day'] }} ~ {{ day_dict['nextweek_end_day'] }})
     <p>
   </div>
   <div>
@@ -181,8 +180,8 @@
               <td>
                 <label for="project_code"></label>
                 <select name="project_code" id="projectCode" class="input_select">
-                  {% if project_list %}
-                    {% for project_info in project_list %}
+                  {% if code_dict['project_list'] %}
+                    {% for project_info in code_dict['project_list'] %}
                       {% if project_info['PROJECT_ID'] == plan_info['PROJECT_ID'] %}
                         <option value="{{ project_info['PROJECT_ID'] }}" selected>{{ project_info['PROJECT_NAME'] }}</option>
                       {% else %}
@@ -224,8 +223,9 @@
   <!-- 보고서 등록 -->
   <div>
     <div class="center_button_wrap">
-      <input type="button" value="보고서 저장" class="empty_button" onclick="getReportInfo()">
-<!--      TODO KYB '보고' 버튼 추가-->
+<!--      TODO 보고서 상태가 '보고'인 경우 버튼 비활성화-->
+      <input type="button" value="보고서 저장" class="empty_button" onclick="saveReport()">
+      <input type="button" value="보고" class="empty_button" onclick="reportReport()">
     </div>
   </div>
 {% endblock %}

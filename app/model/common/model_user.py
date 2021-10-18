@@ -62,3 +62,68 @@ class User(UserMixin):
             result['data'] = ex
         finally:
             return result
+
+    # 사용자 정보 보고서 정보 수정
+    @staticmethod
+    def upd_user_report_info(user_id: str, his_id: str, thisweek_report_id: str = '', lastweek_report_info: str = ''):
+        '''
+        사용자 보고서 관련 정보 수정
+        :param user_id: 사용자 ID
+        :param his_id: 이력 ID
+        :param thisweek_report_id: 금주 보고서 ID (필수X)
+        :param lastweek_report_info: 전주 보고서 ID (필수X)
+        :return:
+        '''
+        result: dict = dict()
+        try:
+            if thisweek_report_id == '' and lastweek_report_info == '':
+                return {'result': 'fail'}
+
+            sql: str = f"UPDATE tn_user_info "
+
+            set_sql: str = f"SET UPDATE_USER_ID = '{user_id}', UPDATE_DATETIME = now() "
+
+            if thisweek_report_id != '':
+                set_sql += f", THISWEEK_REPORT_ID = '{thisweek_report_id}' "
+            if lastweek_report_info != '':
+                set_sql += f", LASTWEEK_REPORT_ID = '{lastweek_report_info}' "
+
+            his_sql: str = User().get_user_his_sql(user_id, his_id, 'UPDATE')
+            sql += set_sql + f"WHERE USER_ID = '{user_id}';" + his_sql
+
+            result = update(sql)
+        except Exception as ex:
+            result['result'] = 'fail'
+            result['data'] = ex
+        finally:
+            return result
+
+    # 사용자 이력 테이블 sql 문 생성
+    @staticmethod
+    def get_user_his_sql(user_id: str, his_id: str, action: str = 'INSERT') -> str:
+        '''
+        사용자 이력 테이블 sql 문 생성
+        :param user_id: 사용자 ID
+        :param his_id: 이력 ID
+        :param action: 이력 행위
+        :return: sql 문
+        '''
+        his_sql = ""
+        if not user_id:
+            return his_sql
+
+        his_sql += f"INSERT INTO th_user_his " \
+                   f"(HIS_ID, HIS_DATETIME, ACTION, USER_ID, USER_NAME, PASSWORD, " \
+                   f"COMPANY_CODE, DEPARTMENT_CODE, POSITION_CODE, AUTH_CODE, PAYMENT_USER_ID, " \
+                   f"REGISTER_DATETIME, LOGIN_DATETIME, " \
+                   f"LASTWEEK_REPORT_ID, THISWEEK_REPORT_ID, " \
+                   f"INSERT_USER_ID, INSERT_DATETIME, UPDATE_USER_ID, UPDATE_DATETIME) " \
+                   f"SELECT '{his_id}', now(), '{action}', USER_ID, USER_NAME, PASSWORD, " \
+                   f"COMPANY_CODE, DEPARTMENT_CODE, POSITION_CODE, AUTH_CODE, PAYMENT_USER_ID, " \
+                   f"REGISTER_DATETIME, LOGIN_DATETIME, " \
+                   f"LASTWEEK_REPORT_ID, THISWEEK_REPORT_ID, " \
+                   f"INSERT_USER_ID, INSERT_DATETIME, UPDATE_USER_ID, UPDATE_DATETIME " \
+                   f"FROM tn_user_info " \
+                   f"WHERE USER_ID = '{user_id}'; "
+
+        return his_sql

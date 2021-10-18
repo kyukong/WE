@@ -27,7 +27,7 @@ textarea { resize: none; }
 
 /* button */
 .color_button { border: none; padding: 10px 50px; color: white; font-size: 15px; font-weight: bold; background-color: #4EC2A9; cursor: pointer; }
-.empty_button { border: #4EC2A9 1px solid; padding: 10px 50px; color: #4EC2A9; font-size: 15px; font-weight: bold; background-color: white; margin-bottom: 50px; cursor: pointer; }
+.empty_button { border: #4EC2A9 1px solid; padding: 10px 50px; color: #4EC2A9; font-size: 15px; font-weight: bold; background-color: white; cursor: pointer; margin: 0 10px 50px 10px; }
 .empty_button:hover { color: #2CA389; border: #2CA389 1px solid; }
 
 /* button_wrap */

@@ -78,7 +78,23 @@ function delInfoTable(btn, infoType=false) {
     infoTable.remove();
 }
 
-// 보고서 등록하기 위해 보고서 정보 조회
+// 보고서 저장
+function saveReport() {
+    var reportInfo = getReportInfo();
+    reportInfo['requestType'] = 'save';
+
+    getReportInsertAPI(reportInfo);
+}
+
+// 보고서 보고(ㅋㅋ)
+function reportReport() {
+    var reportInfo = getReportInfo();
+    reportInfo['requestType'] = 'report';
+
+    getReportInsertAPI(reportInfo);
+}
+
+// 보고서 정보 조회
 function getReportInfo() {
     // 보고서 정보 조회
     var reportDict = {};
@@ -91,6 +107,7 @@ function getReportInfo() {
     var nextweekStartDatetime = dayInfo['nextweek_start_day'];
     var nextweekEndDatetime = dayInfo['nextweek_end_day'];
 
+    reportDict['report_id'] = reportID;
     reportDict['registerDatetime'] = registerDatetime;
     reportDict['paymentUserId'] = paymentUserId;
     reportDict['thisweekStartDatetime'] = thisweekStartDatetime;
@@ -149,19 +166,21 @@ function getReportInfo() {
         }
     }
 
-    getReportInsertAPI(reportDict, workIDList, planInsertInfoList, planUpdateInfoList, planDeleteInfoList);
-}
-
-// 보고서 등록 API 호출
-function getReportInsertAPI(reportDict, workIDList, planInsertInfoList, planUpdateInfoList, planDeleteInfoList) {
-    var url = '/api/v1/workReport/insert';
-    var body = {
+    var returnData = {
         'reportDict': reportDict,
         'workIDList': workIDList,
         'planInsertInfoList': planInsertInfoList,
         'planUpdateInfoList': planUpdateInfoList,
         'planDeleteInfoList': planDeleteInfoList,
     };
+
+    return returnData;
+//    getReportInsertAPI(reportDict, workIDList, planInsertInfoList, planUpdateInfoList, planDeleteInfoList);
+}
+
+// 보고서 등록 API 호출
+function getReportInsertAPI(body) {
+    var url = '/api/v1/workReport/insert';
 
     getAPI(url, 'POST', body)
         .then((result) => {

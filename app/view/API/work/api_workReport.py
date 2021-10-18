@@ -9,19 +9,23 @@ from app.view.API.common.basic import get_ID
 from app.model.work.model_report import Report
 from app.model.work.model_work import Work
 from app.model.work.model_plan import Plan
+from app.model.common.model_user import User
 
 
 # 보고서 등록
 class APIWorkReportInsert(Resource):
-    def get(self):
+    @staticmethod
+    def get():
         return {'result': "get"}
 
-    def post(self):
+    @staticmethod
+    def post():
         user_info = current_user
         if not user_info.is_authenticated:
             return {"result": "fail", "context": "login first"}
 
         body: dict = request.get_json()
+        request_type: str = body['requestType']
         report_dict: dict = body['reportDict']
         work_id_list: list = body['workIDList']
         plan_insert_list: list = body['planInsertInfoList']
@@ -29,36 +33,53 @@ class APIWorkReportInsert(Resource):
         plan_delete_list: list = body['planDeleteInfoList']
 
         user_id = user_info.user_id
-
         his_id = get_ID('HISWRP')
 
-        # 보고서 정보 저장
-        report_id: str = get_ID('WRP')
-        report_dict['report_id'] = report_id
-        report_insert_result = Report().ins_report_info(report_dict, user_id, his_id)
-        if report_insert_result['result'] == 'fail':
-            return {'result': 'fail'}
+        if request_type == 'save':
+            payment_progress_code: str = 'RPS0001'  # 작성중
+            work_state_code: str = 'WRS0002'  # 보고서 작성
+        else:  # request_type == 'report'
+            payment_progress_code: str = 'RPS0002'  # 보고
+            work_state_code: str = 'WRS0003'  # 보고
+
+        # 이전에 작성한 금주 주간보고서가 없을 경우
+        if report_dict['report_id'] == '':
+            # 보고서 정보 저장
+            report_id: str = get_ID('WRP')
+            report_dict['report_id'] = report_id
+            report_dict['payment_progress_code'] = payment_progress_code
+            report_insert_result = Report().ins_report_info(report_dict, user_id, his_id)
+            if report_insert_result['result'] == 'fail':
+                return {'result': 'fail'}
+        else:
+            # 보고서 정보 수정
+            report_dict['payment_progress_code'] = payment_progress_code
+            report_update_result = Report().upd_report_info(report_dict, user_id, his_id)
+            if report_update_result['result'] == 'fail':
+                return {'result': 'fail'}
 
         # 업무 상태 정보 변경
-        work_state_code: str = 'WRS0002'
         work_state_update_result = Work().upd_work_state_info(work_id_list, work_state_code, user_id, his_id)
         if work_state_update_result['result'] == 'fail':
             return {'result': 'fail'}
 
         # 차주 계획 정보 저장
-        # 계획 정보 추가
         for plan_info in plan_insert_list:
             plan_info['planID'] = get_ID("PN")
             plan_info['userID'] = user_id
-
         for plan_info in plan_update_list:
             plan_info['userID'] = user_id
 
-        result = Plan().ins_plan_info(plan_insert_list, plan_update_list, plan_delete_list, his_id)
-        if result['result'] == 'fail':
+        plan_insert_result = Plan().ins_plan_info(plan_insert_list, plan_update_list, plan_delete_list, his_id)
+        if plan_insert_result['result'] == 'fail':
+            return {'result': 'fail'}
+
+        # 사용자 정보 수정
+        user_update_result = User().upd_user_report_info(user_id, his_id, thisweek_report_id=report_dict['report_id'])
+        if user_update_result['result'] == 'fail':
             return {'result': 'fail'}
         else:
-            return result
+            return user_update_result
 
 
 api.add_resource(APIWorkReportInsert, "/api/v1/workReport/insert")
