@@ -1,11 +1,11 @@
 
-// 20211013 KYB add 페이지 이동
+// 페이지 이동
 function getPageWorkReportList(pageEle) {
     var page = pageEle.textContent;
-    getSearchWorkList(page);
+    getSearchWorkReportList(page);
 }
 
-// 20211013 KYB add 보고서 검색 검색어 조회
+// 보고서 검색 검색어 조회
 function getSearchWorkReportList(page='1') {
     var searchStartReportDate = document.getElementById("searchStartReportDate").value.trim();
     var searchEndReportDate = document.getElementById("searchEndReportDate").value.trim();
@@ -22,11 +22,12 @@ function getSearchWorkReportList(page='1') {
     getWorkReportList(parameters);
 }
 
-// 20211013 KYB add 보고서 검색 API 호출
+// 보고서 검색 API 호출
 function getWorkReportList(parameters) {
     getPageGETMethod('/work/report/search', parameters);
 }
 
+// TODO 보고서 상세정보 조회 추가
 //// 20211005 KYB add 업무 상세조회 화면으로 이동
 //function getWorkDetailPage(selectedWorkInfo) {
 //    var workInfo = selectedWorkInfo;

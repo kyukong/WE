@@ -33,9 +33,9 @@ def work_report_search():
     search_word = request.args
     search_list = dict()
     if search_word.get('page'):
-        search_list['page'] = search_word.get('page')
+        page: str = search_word.get('page')
     else:
-        search_list['page'] = '1'
+        page: str = '1'
 
     if search_word:
         search_list['search_start_report_date'] = search_word.get('searchStartReportDate')
@@ -52,7 +52,7 @@ def work_report_search():
         search_list['search_report_user_name'] = ""
     
     # 보고서 정보 조회
-    report_list = Report().get_report_list(search_list)
+    report_list = Report().get_report_list(search_list, page)
     if report_list['result'] != 'fail':
         report_total_count = report_list['total']
         report_list = report_list['data']
@@ -61,7 +61,7 @@ def work_report_search():
         report_list = []
     
     # 페이징 처리
-    page_info = get_page_info(int(search_list['page']), report_total_count)
+    page_info = get_page_info(int(page), report_total_count)
 
     return render_template('/work/template_workReportSearch.html', menu_list=menu_list,
                            now_top_menu_code=now_top_menu_code, now_left_menu_code=now_left_menu_code,

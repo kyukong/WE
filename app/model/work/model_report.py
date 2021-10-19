@@ -9,10 +9,11 @@ class Report:
     
     # 보고서 리스트 조회
     @staticmethod
-    def get_report_list(search_list):
+    def get_report_list(search_list: dict, page: str) -> dict:
         '''
         보고서 검색 화면에서 보고서 리스트 정보 조회
         :param search_list: 검색어
+        :param page: 요청한 페이지
         :return 보고서 리스트 정보
         '''
         result = dict()
@@ -25,7 +26,8 @@ class Report:
 
             sql += f"SELECT REPORT_ID, IFNULL(`report`.REGISTER_DATETIME, '') AS REGISTER_DATETIME, " \
                    f"IFNULL(`report`.USER_ID, '') AS USER_ID, " \
-                   f"IFNULL((SELECT USER_NAME FROM tn_user_info WHERE USER_ID = USER_ID), '') AS USER_NAME, " \
+                   f"IFNULL(`report`.USER_ID, '') AS now_USER_ID, " \
+                   f"IFNULL((SELECT USER_NAME FROM tn_user_info WHERE USER_ID = now_USER_ID), '') AS USER_NAME, " \
                    f"IFNULL((SELECT CODE_NAME " \
                    f"FROM tc_code_info WHERE `CODE` = PAYMENT_PROGRESS_CODE), '') AS PAYMENT_PROGRESS_CODE_NAME, " \
                    f"IFNULL(DATE_FORMAT(THISWEEK_START_DATETIME, '%Y-%m-%d'), '') AS THISWEEK_START_DATETIME, " \
@@ -69,7 +71,8 @@ class Report:
                     where_count += 1
 
             sql += from_sql + where_sql
-            sql += f"LIMIT {str(SEARCH['SEARCH_RESULT_COUNT'] * (int(search_list['page']) - 1))}, " \
+            sql += f"ORDER BY REGISTER_DATETIME DESC " \
+                   f"LIMIT {str(SEARCH['SEARCH_RESULT_COUNT'] * (int(page) - 1))}, " \
                    f"{ str(SEARCH['SEARCH_RESULT_COUNT']) }; "
             total_sql += from_sql + where_sql + "; "
 

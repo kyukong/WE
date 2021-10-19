@@ -11,7 +11,6 @@ from app.model.work.model_work import Work
 from app.view.default.common.basic import set_project_code_ALL, get_menu_list, get_page_info
 
 
-
 # 20210913 KYB add 업무 검색 추가
 @app.route('/work/search')
 @login_required
@@ -32,11 +31,10 @@ def work_search():
     # 검색어 조회
     search_word = request.args
     search_list = dict()
-    search_list['page'] = search_word.get('page')
     if search_word.get('page'):
-        search_list['page'] = search_word.get('page')
+        page: str = search_word.get('page')
     else:
-        search_list['page'] = '1'
+        page: str = '1'
 
     if search_word:
         search_list['search_start_word_date'] = search_word.get('searchStartWorkDate')
@@ -53,7 +51,7 @@ def work_search():
         search_list['search_work_user_name'] = ""
     
     # 업무 정보 조회
-    work_list = Work().get_work_list(search_list)
+    work_list = Work().get_work_list(search_list, page)
     if work_list['result'] != 'fail':
         work_total_count = work_list['total']
         work_list = work_list['data']
@@ -62,7 +60,7 @@ def work_search():
         work_list = []
     
     # 페이징 처리
-    page_info = get_page_info(int(search_list['page']), work_total_count)
+    page_info = get_page_info(int(page), work_total_count)
 
     return render_template('/work/template_workSearch.html', menu_list=menu_list,
                             now_top_menu_code=now_top_menu_code, now_left_menu_code=now_left_menu_code,

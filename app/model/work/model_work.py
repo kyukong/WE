@@ -5,12 +5,13 @@ from app.config import DB, SEARCH
 
 class Work:
     
-    # 20210913 KYB add 업무 정보 조회
+    # 업무 정보 조회
     @staticmethod
-    def get_work_list(search_list):
+    def get_work_list(search_list: dict, page: str) -> dict:
         '''
         업무 검색 화면에서 업무 리스트 정보 조회
         :param search_list: 검색어
+        :param page: 요청한 페이지
         :return 업무 리스트 정보
         '''
         result = dict()
@@ -21,24 +22,28 @@ class Work:
             from_sql = ""
             where_sql = ""
 
-            sql += f"SELECT WORK_ID, PROJECT_ID, PROJECT_ID AS now_PROJECT_ID,  "
-            sql += f"IFNULL((SELECT PROJECT_NAME FROM tn_project_info WHERE PROJECT_ID = now_PROJECT_ID), '') AS PROJECT_NAME, "
-            sql += f"IFNULL(PLAN, '') AS PLAN, "
-            sql += f"IFNULL(WORK_STATE_CODE, '') AS WORK_STATE_CODE, "
-            sql += f"IFNULL((SELECT CODE_NAME FROM tc_code_info WHERE `CODE` = WORK_STATE_CODE), '') AS WORK_STATE_CODE_NAME, "
-            sql += f"IFNULL(WORK_PROGRESS_CODE, '') AS WORK_PROGRESS_CODE, "
-            sql += f"IFNULL(DATE_FORMAT(WORK_DATE, '%Y-%m-%d'), '') AS WORK_DATE, IFNULL(`work`.USER_ID, '') AS USER_ID, "
-            sql += f"IFNULL((SELECT USER_NAME FROM tn_user_info WHERE USER_ID = USER_ID), '') AS USER_NAME, "
-            sql += f"IFNULL(WORK_CONTENT, '') AS WORK_CONTENT, IFNULL(DELAY_CONTENT, '') AS DELAY_CONTENT, "
-            sql += f"IFNULL(SOLUTION_CONTENT, '') AS SOLUTION_CONTENT, IFNULL(MEMO, '') AS MEMO, "
-            sql += f"`work`.INSERT_USER_ID, `work`.INSERT_DATETIME, `work`.UPDATE_USER_ID, `work`.UPDATE_DATETIME "
+            sql += f"SELECT WORK_ID, PROJECT_ID, PROJECT_ID AS now_PROJECT_ID, " \
+                   f"IFNULL((SELECT PROJECT_NAME FROM tn_project_info WHERE PROJECT_ID = now_PROJECT_ID), '') " \
+                   f"AS PROJECT_NAME, " \
+                   f"IFNULL(PLAN, '') AS PLAN, " \
+                   f"IFNULL(WORK_STATE_CODE, '') AS WORK_STATE_CODE, " \
+                   f"IFNULL((SELECT CODE_NAME FROM tc_code_info WHERE `CODE` = WORK_STATE_CODE), '') " \
+                   f"AS WORK_STATE_CODE_NAME, " \
+                   f"IFNULL(WORK_PROGRESS_CODE, '') AS WORK_PROGRESS_CODE, " \
+                   f"IFNULL(DATE_FORMAT(WORK_DATE, '%Y-%m-%d'), '') AS WORK_DATE, " \
+                   f"IFNULL(`work`.USER_ID, '') AS USER_ID, " \
+                   f"IFNULL(`work`.USER_ID, '') AS now_USER_ID, " \
+                   f"IFNULL((SELECT USER_NAME FROM tn_user_info WHERE USER_ID = now_USER_ID), '') AS USER_NAME, " \
+                   f"IFNULL(WORK_CONTENT, '') AS WORK_CONTENT, IFNULL(DELAY_CONTENT, '') AS DELAY_CONTENT, " \
+                   f"IFNULL(SOLUTION_CONTENT, '') AS SOLUTION_CONTENT, IFNULL(MEMO, '') AS MEMO, " \
+                   f"`work`.INSERT_USER_ID, `work`.INSERT_DATETIME, `work`.UPDATE_USER_ID, `work`.UPDATE_DATETIME "
 
             total_sql += f"SELECT count(*) AS total "
 
             from_sql += f"FROM tn_work_info AS `work` "
             if search_list:
-                from_sql += f"JOIN tn_user_info AS `user` "
-                from_sql += f"ON `work`.USER_ID = `user`.USER_ID "
+                from_sql += f"JOIN tn_user_info AS `user` " \
+                            f"ON `work`.USER_ID = `user`.USER_ID "
                 
                 where_count = 0
                 if search_list['search_start_word_date'] != "":
@@ -71,8 +76,9 @@ class Work:
                     where_count += 1
             
             sql += from_sql + where_sql
-            sql += f"LIMIT {str(SEARCH['SEARCH_RESULT_COUNT'] * (int(search_list['page']) - 1))}, "
-            sql += f"{ str(SEARCH['SEARCH_RESULT_COUNT']) }; "
+            sql += f"ORDER BY WORK_DATE DESC " \
+                   f"LIMIT {str(SEARCH['SEARCH_RESULT_COUNT'] * (int(page) - 1))}, " \
+                   f"{ str(SEARCH['SEARCH_RESULT_COUNT']) }; "
             total_sql += from_sql + where_sql + "; "
 
             result = select(sql)
