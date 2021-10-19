@@ -223,9 +223,10 @@
   <!-- 보고서 등록 -->
   <div>
     <div class="center_button_wrap">
-<!--      TODO 보고서 상태가 '보고'인 경우 버튼 비활성화-->
-      <input type="button" value="보고서 저장" class="empty_button" onclick="saveReport()">
-      <input type="button" value="보고" class="empty_button" onclick="reportReport()">
+      {% if report_dict['payment_progress_code'] == 'RPS0001' %}
+        <input type="button" value="보고서 저장" class="empty_button" onclick="saveReport()">
+        <input type="button" value="보고" class="empty_button" onclick="reportReport()">
+      {% endif %}
     </div>
   </div>
 {% endblock %}

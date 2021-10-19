@@ -92,32 +92,31 @@ def work_report_insert():
     report_dict: dict = dict()
 
     # 주간보고서 정보 조회
-    # TODO 주간보고서 존재 여부 확인 방법 변경(-> 사용자 테이블에서 금주 보고서 아이디 확인)
-    thisweek_report_dict: dict = Report().get_thisweek_report_info(user_id, day_dict['thisweek_start_day'])
-    # 이전에 작성한 금주 주간보고서가 존재할 경우
-    if thisweek_report_dict['result'] != 'fail' and thisweek_report_dict['data']:
+    user_dict: dict = User().get_user_info(user_id)
+    if user_dict['result'] == 'fail' or user_dict['count'] == 0:
+        return 'alert("존재하지 않은 사용자 입니다.");location.href="/";'
+    user_dict = user_dict['data'][0]
+
+    if user_dict['THISWEEK_REPORT_ID'] != '':
+        report_id = user_dict['THISWEEK_REPORT_ID']
+    else:
+        report_id: str = ''
+
+    thisweek_report_dict: dict = Report().get_report_info(report_id)
+    # 이전에 작성한 금주 주간보고서가 있을 경우
+    if thisweek_report_dict['result'] != 'fail' and thisweek_report_dict['count'] != 0:
         thisweek_report_info: dict = thisweek_report_dict['data'][0]
-        report_id: str = thisweek_report_info['REPORT_ID']
+
         payment_progress_code: str = thisweek_report_info['PAYMENT_PROGRESS_CODE']
         payment_progress_code_name: str = thisweek_report_info['PAYMENT_PROGRESS_CODE_NAME']
         payment_user_id: str = thisweek_report_info['PAYMENT_USER_ID']
         payment_user_name: str = thisweek_report_info['PAYMENT_USER_NAME']
-
     # 이전에 작성한 금주 주간보고서가 없을 경우
     else:
-        report_id: str = ''
         payment_progress_code: str = 'RPS0001'
         payment_progress_code_name: str = '작성중'
-
-        # 결재자 정보 조회
-        user_dict: dict = User().get_user_info(user_id)
-        if user_dict['result'] != 'fail' and user_dict['count'] != 0:
-            user_dict = user_dict['data'][0]
-            payment_user_id: str = user_dict['PAYMENT_USER_ID']
-            payment_user_name: str = user_dict['PAYMENT_USER_NAME']
-        else:
-            payment_user_id: str = ''
-            payment_user_name: str = ''
+        payment_user_id: str = user_dict['PAYMENT_USER_ID']
+        payment_user_name: str = user_dict['PAYMENT_USER_NAME']
 
     report_dict['report_id'] = report_id
     report_dict['payment_progress_code'] = payment_progress_code

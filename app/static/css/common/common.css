@@ -27,11 +27,11 @@ textarea { resize: none; }
 
 /* button */
 .color_button { border: none; padding: 10px 50px; color: white; font-size: 15px; font-weight: bold; background-color: #4EC2A9; cursor: pointer; }
-.empty_button { border: #4EC2A9 1px solid; padding: 10px 50px; color: #4EC2A9; font-size: 15px; font-weight: bold; background-color: white; cursor: pointer; margin: 0 10px 50px 10px; }
+.empty_button { border: #4EC2A9 1px solid; padding: 10px 50px; color: #4EC2A9; font-size: 15px; font-weight: bold; background-color: white; cursor: pointer; margin: 0 10px 0px 10px; }
 .empty_button:hover { color: #2CA389; border: #2CA389 1px solid; }
 
 /* button_wrap */
-.center_button_wrap { text-align: center; }
+.center_button_wrap { text-align: center; margin-bottom: 50px; }
 .right_button_wrap { text-align: right; }
 .center_column_button_wrap { display: flex; flex-direction: column; }
 .center_column_button_wrap input { margin: 5px auto; padding: 10px; width: 70%; border: none; background-color: #4EC2A9; color: white; font-weight: bold; font-size: 15px; border-radius: 4px; cursor: pointer; }

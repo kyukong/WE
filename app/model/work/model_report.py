@@ -7,7 +7,7 @@ from app.config import DB, SEARCH
 
 class Report:
     
-    # 보고서 정보 조회
+    # 보고서 리스트 조회
     @staticmethod
     def get_report_list(search_list):
         '''
@@ -81,6 +81,45 @@ class Report:
             else:
                 result['total'] = 0
             
+        except Exception as ex:
+            result['result'] = 'fail'
+            result['data'] = ex
+        finally:
+            return result
+
+    # 보고서 정보 조회
+    @staticmethod
+    def get_report_info(report_id: str) -> dict:
+        '''
+        보고서 상세정보 정보 조회
+        :param report_id: 보고서 ID
+        :return: 보고서 정보
+        '''
+        result: dict = dict()
+        try:
+            sql: str = f"SELECT REPORT_ID, IFNULL(REGISTER_DATETIME, '') AS REGISTER_DATETIME, " \
+                       f"IFNULL(USER_ID, '') AS USER_ID, " \
+                       f"IFNULL(PAYMENT_USER_ID, '') AS PAYMENT_USER_ID, " \
+                       f"IFNULL((SELECT USER_NAME FROM tn_user_info WHERE USER_ID = PAYMENT_USER_ID), '') " \
+                       f"AS PAYMENT_USER_NAME, " \
+                       f"IFNULL(PAYMENT_PROGRESS_CODE, '') AS PAYMENT_PROGRESS_CODE, " \
+                       f"IFNULL((SELECT CODE_NAME FROM tc_code_info WHERE `CODE` = PAYMENT_PROGRESS_CODE), '') " \
+                       f"AS PAYMENT_PROGRESS_CODE_NAME, " \
+                       f"IFNULL(DATE_FORMAT(PAYMENT_DATETIME, '%Y-%m-%d %H:%i:%s'), '') AS PAYMENT_DATETIME, " \
+                       f"IFNULL(PAYMENT_RETURN_CONTENT, '') AS PAYMENT_RETURN_CONTENT, " \
+                       f"IFNULL(DATE_FORMAT(THISWEEK_START_DATETIME, '%Y-%m-%d %H:%i:%s'), '') " \
+                       f"AS THISWEEK_START_DATETIME, " \
+                       f"IFNULL(DATE_FORMAT(THISWEEK_END_DATETIME, '%Y-%m-%d %H:%i:%s'), '') AS THISWEEK_END_DATETIME, " \
+                       f"IFNULL(DATE_FORMAT(NEXTWEEK_START_DATETIME, '%Y-%m-%d %H:%i:%s'), '') " \
+                       f"AS NEXTWEEK_START_DATETIME, " \
+                       f"IFNULL(DATE_FORMAT(NEXTWEEK_END_DATETIME, '%Y-%m-%d %H:%i:%s'), '') AS NEXTWEEK_END_DATETIME, " \
+                       f"IFNULL(INSERT_USER_ID, '') AS INSERT_USER_ID, " \
+                       f"IFNULL(DATE_FORMAT(INSERT_DATETIME, '%Y-%m-%d %H:%i:%s'), '') AS INSERT_DATETIME, " \
+                       f"IFNULL(UPDATE_USER_ID, '') AS UPDATE_USER_ID, " \
+                       f"IFNULL(DATE_FORMAT(UPDATE_DATETIME, '%Y-%m-%d %H:%i:%s'), '') AS UPDATE_DATETIME " \
+                       f"FROM tn_report_info " \
+                       f"WHERE REPORT_ID = '{report_id}';"
+            result = select(sql)
         except Exception as ex:
             result['result'] = 'fail'
             result['data'] = ex
