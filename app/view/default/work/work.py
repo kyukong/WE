@@ -110,7 +110,7 @@ def work_detail(day):
     code_list = dict()
     code_list['work_state_code_list'] = work_state_code_list
 
-    return render_template('/work/template_workInsert.html', menu_list=menu_list, now_top_menu=now_top_menu, 
-                        project_list=project_list, work_day=day, code_list=code_list,
-                        plan_list=plan_list, work_list=work_list)
+    return render_template('/work/template_workInsert.html', menu_list=menu_list, now_top_menu=now_top_menu,
+                           project_list=project_list, work_day=day, code_list=code_list,
+                           plan_list=plan_list, work_list=work_list)
 

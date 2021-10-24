@@ -251,13 +251,73 @@ class Work:
             result['data'] = ex
         finally:
             return result
-    
-    # 20211004 KYB add 계획 정보 조회
+
+    # 업무 상세정보 조회 화면에서 계획 정보 조회
     @staticmethod
-    def get_plan_info(user_id, plan_start_date, plan_end_date=False):
+    def get_plan_info(user_id: str, plan_day: str) -> dict:
         '''
-        업무 상세정보 조회 화면에서 계획 정보 조회
-        보고서 화면에서 계획 정보 조회
+        특정 사용자가 작성한 특정 날짜의 계획만 조회
+        :param user_id: 작성자
+        :param plan_day: 계획 일자
+        :return: 계획 정보 리스트
+        '''
+        result = dict()
+
+        try:
+            sql: str = f"SELECT PLAN_ID, IFNULL(PROJECT_ID, '') AS PROJECT_ID, " \
+                       f"IFNULL(DATE_FORMAT(PLAN_DATE, '%Y-%m-%d'), '') AS PLAN_DATE, " \
+                       f"IFNULL(`USER_ID`, '') AS USER_ID, IFNULL(PLAN, '') AS PLAN, IFNULL(MEMO, '') AS MEMO, " \
+                       f"INSERT_USER_ID, INSERT_DATETIME, UPDATE_USER_ID, UPDATE_DATETIME " \
+                       f"FROM `tn_plan_info` " \
+                       f"WHERE PLAN_DATE = '{plan_day}' AND `USER_ID` = '{user_id}' "
+            sql += f"ORDER BY INSERT_DATETIME; "
+
+            result = select(sql)
+
+        except Exception as ex:
+            result['result'] = 'fail'
+            result['data'] = ex
+        finally:
+            return result
+
+    # 업무 상세정보 조회 화면에서 업무 정보 조회
+    @staticmethod
+    def get_work_info(user_id: str, work_day: str) -> dict:
+        '''
+        특정 사용자가 작성한 특정 날짜의 업무만 조회
+        :param user_id: 작성자
+        :param work_day: 업무 일자
+        :return: 업무 정보 리스트
+        '''
+        result = dict()
+
+        try:
+            sql: str = f"SELECT WORK_ID, IFNULL(PROJECT_ID, '') AS PROJECT_ID, IFNULL(PLAN, '') AS PLAN, " \
+                       f"IFNULL(WORK_STATE_CODE, '') AS WORK_STATE_CODE, " \
+                       f"IFNULL(WORK_PROGRESS_CODE, '') AS WORK_PROGRESS_CODE, " \
+                       f"IFNULL(DATE_FORMAT(WORK_DATE, '%Y-%m-%d'), '') AS WORK_DATE, " \
+                       f"IFNULL(`USER_ID`, '') AS USER_ID, IFNULL(WORK_CONTENT, '') AS WORK_CONTENT, " \
+                       f"IFNULL(DELAY_CONTENT, '') AS DELAY_CONTENT, IFNULL(SOLUTION_CONTENT, '') AS SOLUTION_CONTENT, " \
+                       f"IFNULL(MEMO, '') AS MEMO, IFNULL(FTP_PATH, '') AS FTP_PATH, " \
+                       f"INSERT_USER_ID, INSERT_DATETIME, UPDATE_USER_ID, UPDATE_DATETIME " \
+                       f"FROM `tn_work_info` " \
+                       f"WHERE WORK_DATE = '{work_day}' AND `USER_ID` = '{user_id}' "
+            sql += f"ORDER BY INSERT_DATETIME; "
+
+            result = select(sql)
+
+        except Exception as ex:
+            result['result'] = 'fail'
+            result['data'] = ex
+        finally:
+            return result
+
+    # 보고서 화면에서 계획 정보 조회
+    @staticmethod
+    def get_report_plan_info(user_id, plan_start_date, plan_end_date=False):
+        '''
+        보고서 등록 화면에서 계획 정보 조회 -> 사용자 ID 필요
+        보고서 상세정보 조회 화면에서 계획 정보 조회
         :param user_id: 작성자
         :param plan_start_date: 계획 등록 일자
         :param plan_end_date: 계획 종료 일자
@@ -284,12 +344,12 @@ class Work:
         finally:
             return result
 
-    # 20211004 KYB add 업무 정보 조회
+    # 보고서 화면에서 업무 정보 조회
     @staticmethod
-    def get_work_info(user_id, work_start_date, work_end_date=False):
+    def get_report_work_info(user_id, work_start_date, work_end_date=False):
         '''
-        업무 상세정보 조회 화면에서 업무 정보 조회
-        보고서 화면에서 업무 정보 조회
+        보고서 등록 화면에서 업무 정보 조회 -> 사용자 ID 필요
+        보고서 상세정보 조회 화면에서 업무 정보 조회
         :param user_id: 작성자
         :param work_start_date: 업무 시작 일자
         :param work_end_date: 업무 종료 일자

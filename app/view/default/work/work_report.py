@@ -188,15 +188,17 @@ def work_report_detail():
     report_dict['payment_user_id'] = req_report_dict['PAYMENT_USER_ID']
     report_dict['payment_user_name'] = req_report_dict['PAYMENT_USER_NAME']
 
+    report_user_id = req_report_dict['USER_ID']
+
     # 금주 일정 조회
-    work_list = Work().get_work_info(user_id, day_dict['thisweek_start_day'], day_dict['thisweek_end_day'])
+    work_list = Work().get_report_work_info(report_user_id, day_dict['thisweek_start_day'], day_dict['thisweek_end_day'])
     if work_list['result'] != 'fail':
         work_list = work_list['data']
     else:
         work_list = []
 
     # 차주 계획 조회
-    plan_list = Work().get_plan_info(user_id, day_dict['nextweek_start_day'], day_dict['nextweek_end_day'])
+    plan_list = Work().get_report_plan_info(report_user_id, day_dict['nextweek_start_day'], day_dict['nextweek_end_day'])
     if plan_list['result'] != 'fail':
         plan_list = plan_list['data']
     else:
