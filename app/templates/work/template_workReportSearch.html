@@ -70,7 +70,8 @@
 
     <!-- 검색 결과 -->
     <div>
-        <p class="sub_title">검색결과({{ report_total_count }})<p>
+        <p class="sub_title">검색결과({{ report_total_count }})</p>
+        <input type="button" value="보고서 등록" class="empty_button" style="float: right;" onclick="getWorkReportInsertPage()">
         <table class="col_table">
             <thead>
                 <colgroup>
@@ -89,7 +90,7 @@
                 </tr>
                 {% if report_list %}
                     {% for report_info in report_list %}
-                        <tr onclick="getWorkDetailPage(this)" id="{{ report_info['REPORT_ID'] }}">
+                        <tr onclick="getWorkReportDetailPage(this)" id="{{ report_info['REPORT_ID'] }}">
                             <td>
                                 {% if report_info['THISWEEK_START_DATETIME'] %}
                                     {% if report_info['THISWEEK_END_DATETIME'] %}

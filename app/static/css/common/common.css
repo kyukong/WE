@@ -6,7 +6,7 @@ textarea { resize: none; }
 .none { display: none; }
 
 .main_title { font-size: 25px; font-weight: bold; width: fit-content; }
-.sub_title { font-weight: bold; }
+.sub_title { font-weight: bold; display: inline-block; }
 
 /* 테이블 */
 .row_table { width: 100%; border: solid #f2f2f2 2px; padding: 10px; margin: auto; margin-bottom: 20px; }

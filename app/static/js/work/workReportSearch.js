@@ -27,13 +27,20 @@ function getWorkReportList(parameters) {
     getPageGETMethod('/work/report/search', parameters);
 }
 
-// TODO 보고서 상세정보 조회 추가
-//// 20211005 KYB add 업무 상세조회 화면으로 이동
-//function getWorkDetailPage(selectedWorkInfo) {
-//    var workInfo = selectedWorkInfo;
-//    var workDay = workInfo.querySelector("#workDay").textContent;
-//    var url = '/work/' + workDay;
-//
-//    getPageGETMethod(url);
-//}
-//
+// 보고서 상세조회 화면으로 이동
+function getWorkReportDetailPage(selectedWorkReportInfo) {
+    var workReportInfo = selectedWorkReportInfo;
+    var reportID = workReportInfo.getAttribute('id');
+
+    var url = '/work/report/detail';
+    var parameters = 'report_id=' + reportID;
+
+    getPageGETMethod(url, parameters);
+}
+
+// 보고서 등록 화면으로 이동
+function getWorkReportInsertPage() {
+    var url = '/work/report/insert';
+
+    getPageGETMethod(url);
+}

@@ -73,6 +73,11 @@ def work_report_search():
 @app.route('/work/report/insert')
 @login_required
 def work_report_insert():
+    '''
+    보고서를 등록하기를 요청한 사용자의 주간보고서 등록
+    이전에 작성한 주간보고서가 존재할 경우 작성한 주간보고서 표출
+    :return:
+    '''
     now_user = current_user
     user_id = now_user.user_id
     user_name = now_user.user_name
@@ -80,7 +85,7 @@ def work_report_insert():
     # 메뉴 조회
     menu_list = get_menu_list()
     now_top_menu_code = 'MENWRK'
-    now_left_menu_code = 'MENWRK003'
+    now_left_menu_code = 'MENWRK001'
 
     # 날짜 관련
     day_dict: dict = get_date_info()
@@ -143,6 +148,71 @@ def work_report_insert():
                            user_name=user_name, day_dict=day_dict, work_list=work_list,
                            code_dict=code_dict, report_dict=report_dict,
                            plan_list=plan_list)
+
+
+# 업무 보고서 상세정보 조회
+@app.route('/work/report/detail')
+@login_required
+def work_report_detail():
+    '''
+    주간보고서 아이디로 상세정보 조회
+    :return:
+    '''
+    now_user = current_user
+    user_id = now_user.user_id
+    user_name = now_user.user_name
+
+    # 메뉴 조회
+    menu_list: dict = get_menu_list()
+    now_top_menu_code = 'MENWRK'
+    now_left_menu_code = 'MENWRK001'
+
+    # 날짜 관련
+    day_dict: dict = get_date_info()
+
+    # 코드 관련
+    code_dict: dict = get_report_code_info()
+
+    # 보고서 관련
+    report_id: str = request.args['report_id']
+
+    req_report_dict: dict = Report().get_report_info(report_id)
+    if req_report_dict['result'] == 'fail' or req_report_dict['count'] == 0:
+        return 'alert("존재하지 않은 보고서 입니다.");location.href="/";'
+    req_report_dict = req_report_dict['data'][0]
+
+    report_dict: dict = dict()
+    report_dict['report_id'] = report_id
+    report_dict['payment_progress_code'] = req_report_dict['PAYMENT_PROGRESS_CODE']
+    report_dict['payment_progress_code_name'] = req_report_dict['PAYMENT_PROGRESS_CODE_NAME']
+    report_dict['payment_user_id'] = req_report_dict['PAYMENT_USER_ID']
+    report_dict['payment_user_name'] = req_report_dict['PAYMENT_USER_NAME']
+
+    # 금주 일정 조회
+    work_list = Work().get_work_info(user_id, day_dict['thisweek_start_day'], day_dict['thisweek_end_day'])
+    if work_list['result'] != 'fail':
+        work_list = work_list['data']
+    else:
+        work_list = []
+
+    # 차주 계획 조회
+    plan_list = Work().get_plan_info(user_id, day_dict['nextweek_start_day'], day_dict['nextweek_end_day'])
+    if plan_list['result'] != 'fail':
+        plan_list = plan_list['data']
+    else:
+        plan_list = []
+
+    auth_dict: dict = {
+        'update_info': 'N',
+    }
+    if user_id == req_report_dict['USER_ID']:
+        auth_dict['update_info'] = 'Y'
+
+    return render_template('/work/template_workReportInsert.html', menu_list=menu_list,
+                           now_top_menu_code=now_top_menu_code, now_left_menu_code=now_left_menu_code,
+                           user_name=user_name, day_dict=day_dict, work_list=work_list,
+                           code_dict=code_dict, report_dict=report_dict,
+                           plan_list=plan_list, auth_dict=auth_dict)
 
 
 # 보고서 날짜 정보 조회

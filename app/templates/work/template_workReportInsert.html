@@ -224,8 +224,10 @@
   <div>
     <div class="center_button_wrap">
       {% if report_dict['payment_progress_code'] == 'RPS0001' %}
-        <input type="button" value="보고서 저장" class="empty_button" onclick="saveReport()">
-        <input type="button" value="보고" class="empty_button" onclick="reportReport()">
+        {% if auth_dict and auth_dict['update_info'] == 'Y' %}
+          <input type="button" value="보고서 저장" class="empty_button" onclick="saveReport()">
+          <input type="button" value="보고" class="empty_button" onclick="reportReport()">
+        {% endif %}
       {% endif %}
     </div>
   </div>
