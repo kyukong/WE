@@ -28,7 +28,13 @@
             <th>등록일자</th>
             <td id="REGISTER_DATETIME">{{ day_dict['today'] }}</td>
             <th>보고서 상태</th>
-            <td id="PAYMENT_PROGRESS_CODE">{{ report_dict['payment_progress_code_name'] }}</td>
+            <td id="PAYMENT_PROGRESS_CODE">
+              {% if report_dict %}
+                {{ report_dict['PAYMENT_PROGRESS_CODE_NAME'] }}
+              {% else %}
+                작성중
+              {% endif %}
+            </td>
           </tr>
           <tr>
             <th>작성자</th>
@@ -37,7 +43,19 @@
           </tr>
           <tr>
             <th>결재자</th>
-            <td id="PAYMENT_USER_ID" data-payment_user_id="{{ report_dict['payment_user_id'] }}">{{ report_dict['payment_user_name'] }}</td>
+            <td id="PAYMENT_USER_ID" data-payment_user_id="
+            {% if report_dict %}
+              {{ report_dict['PAYMENT_USER_ID'] }}
+            {% elif user_dict %}
+              {{ user_dict['PAYMENT_USER_NAME'] }}
+            {% endif %}
+            ">
+              {% if report_dict %}
+                {{ report_dict['PAYMENT_USER_NAME'] }}
+              {% elif user_dict %}
+                {{ user_dict['PAYMENT_USER_NAME'] }}
+              {% endif %}
+            </td>
             <th>결재일자</th>
             <td></td>
           </tr>
@@ -191,11 +209,13 @@
                   {% endif %}
                 </select>
               </td>
-              <td rowspan="3">
-                <div class="center_column_button_wrap">
-                  <input type="button" value="계획 삭제" onclick="delInfoTable(this, 'plan')">
-                </div>
-              </td>
+              {% if auth_dict['update_auth'] == 'Y' %}
+                <td rowspan="3">
+                  <div class="center_column_button_wrap">
+                    <input type="button" value="계획 삭제" onclick="delInfoTable(this, 'plan')">
+                  </div>
+                </td>
+              {% endif %}
             </tr>
             <tr>
               <th>계획</th>
@@ -215,18 +235,25 @@
       {% endif %}
     </div>
     <!-- 추가 버튼 -->
-    <div class="right_button_wrap">
-      <input type="button" value="추가" class="color_button" onclick="getPlanTable()">
-    </div>
+    {% if auth_dict['update_auth'] == 'Y' %}
+      <div class="right_button_wrap">
+        <input type="button" value="추가" class="color_button" onclick="getPlanTable()">
+      </div>
+    {% endif %}
   </div>
 
   <!-- 보고서 등록 -->
   <div>
     <div class="center_button_wrap">
-      {% if report_dict['payment_progress_code'] == 'RPS0001' %}
-        {% if auth_dict and auth_dict['update_info'] == 'Y' %}
+      {% if not report_dict or report_dict['PAYMENT_PROGRESS_CODE'] == 'RPS0001' %}
+        {% if auth_dict and auth_dict['update_auth'] == 'Y' %}
           <input type="button" value="보고서 저장" class="empty_button" onclick="saveReport()">
-          <input type="button" value="보고" class="empty_button" onclick="reportReport()">
+          <input type="button" value="보고" class="empty_button" onclick="approvalReport()">
+        {% endif %}
+      {% elif report_dict and report_dict['PAYMENT_PROGRESS_CODE'] == 'RPS0002' %}
+        {% if auth_dict and auth_dict['payment_auth'] == 'Y' %}
+          <input type="button" value="결재" class="empty_button" onclick="">
+          <input type="button" value="반려" class="empty_button" onclick="">
         {% endif %}
       {% endif %}
     </div>

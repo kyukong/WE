@@ -101,7 +101,9 @@ class Report:
         result: dict = dict()
         try:
             sql: str = f"SELECT REPORT_ID, IFNULL(REGISTER_DATETIME, '') AS REGISTER_DATETIME, " \
-                       f"IFNULL(USER_ID, '') AS USER_ID, " \
+                       f"IFNULL(USER_ID, '') AS USER_ID, USER_ID AS now_USER_ID, " \
+                       f"IFNULL((SELECT USER_NAME FROM tn_user_info WHERE USER_ID = now_USER_ID), '') " \
+                       f"AS USER_NAME, " \
                        f"IFNULL(PAYMENT_USER_ID, '') AS PAYMENT_USER_ID, " \
                        f"IFNULL((SELECT USER_NAME FROM tn_user_info WHERE USER_ID = PAYMENT_USER_ID), '') " \
                        f"AS PAYMENT_USER_NAME, " \
@@ -220,6 +222,9 @@ class Report:
         '''
         result: dict = dict()
         try:
+            # TODO 파라미터에 '반려 내용' 추가
+            #  입력받은 결재 상태값에 따라 REGISTER_DATETIME 를 now()로 할지 아무것도 안할지 수정
+            #  보고서를 작성한 사용자가 선택한 상태값일 경우 now(), 결재자가 선택한 상태값일 경우 X
             sql = f"UPDATE tn_report_info " \
                   f"SET REGISTER_DATETIME = now(), " \
                   f"PAYMENT_PROGRESS_CODE = '{report_dict['payment_progress_code']}', " \

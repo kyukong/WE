@@ -86,8 +86,8 @@ function saveReport() {
     getReportInsertAPI(reportInfo);
 }
 
-// 보고서 보고(ㅋㅋ)
-function reportReport() {
+// 보고서 보고
+function approvalReport() {
     var reportInfo = getReportInfo();
     reportInfo['requestType'] = 'report';
 
@@ -175,7 +175,6 @@ function getReportInfo() {
     };
 
     return returnData;
-//    getReportInsertAPI(reportDict, workIDList, planInsertInfoList, planUpdateInfoList, planDeleteInfoList);
 }
 
 // 보고서 등록 API 호출

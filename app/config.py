@@ -1,7 +1,8 @@
 
 # DB 관련
 DB = {
-    'host': '127.0.0.1', 
+    'host': '127.0.0.1',
+    # 'host': '3.38.135.103',
     'port': 3306,
     'user_id': 'root',
     'user_pw': 'root',

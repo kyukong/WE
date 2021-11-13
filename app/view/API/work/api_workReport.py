@@ -82,4 +82,40 @@ class APIWorkReportInsert(Resource):
             return user_update_result
 
 
+# 보고서 결재
+class APIWorkApprovalReport(Resource):
+    @staticmethod
+    def get():
+        return {'result': "get"}
+
+    @staticmethod
+    def post():
+        user_info = current_user
+        if not user_info.is_authenticated:
+            return {"result": "fail", "context": "login first"}
+
+        # 업무 상태코드 수정
+
+        # 보고서 상태코드 및 결재 시간 수정
+
+
+# 보고서 반려
+class APIWorkReportReturn(Resource):
+    @staticmethod
+    def get():
+        return {'result': "get"}
+
+    @staticmethod
+    def post():
+        user_info = current_user
+        if not user_info.is_authenticated:
+            return {"result": "fail", "context": "login first"}
+
+        # 업무 상태코드 수정
+
+        # 보고서 상태코드 및 결재시간, 반려 내용 수정
+
+        # 사용자 이번주 보고서 정보 수정
+
+
 api.add_resource(APIWorkReportInsert, "/api/v1/workReport/insert")

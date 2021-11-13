@@ -1,7 +1,8 @@
-from flask import render_template, request
+from flask import render_template, request, redirect, url_for
 from app import app
 from flask_login import login_required, current_user
 from datetime import datetime, timedelta
+from collections import defaultdict
 
 from app.model.common.model_code import Code
 from app.model.work.model_report import Report
@@ -101,53 +102,33 @@ def work_report_insert():
     if user_dict['result'] == 'fail' or user_dict['count'] == 0:
         return 'alert("존재하지 않은 사용자 입니다.");location.href="/";'
     user_dict = user_dict['data'][0]
+    report_id = user_dict['THISWEEK_REPORT_ID']
 
-    if user_dict['THISWEEK_REPORT_ID'] != '':
-        report_id = user_dict['THISWEEK_REPORT_ID']
-    else:
-        report_id: str = ''
-
-    thisweek_report_dict: dict = Report().get_report_info(report_id)
-    # 이전에 작성한 금주 주간보고서가 있을 경우
-    if thisweek_report_dict['result'] != 'fail' and thisweek_report_dict['count'] != 0:
-        thisweek_report_info: dict = thisweek_report_dict['data'][0]
-
-        payment_progress_code: str = thisweek_report_info['PAYMENT_PROGRESS_CODE']
-        payment_progress_code_name: str = thisweek_report_info['PAYMENT_PROGRESS_CODE_NAME']
-        payment_user_id: str = thisweek_report_info['PAYMENT_USER_ID']
-        payment_user_name: str = thisweek_report_info['PAYMENT_USER_NAME']
-    # 이전에 작성한 금주 주간보고서가 없을 경우
-    else:
-        payment_progress_code: str = 'RPS0001'
-        payment_progress_code_name: str = '작성중'
-        payment_user_id: str = user_dict['PAYMENT_USER_ID']
-        payment_user_name: str = user_dict['PAYMENT_USER_NAME']
-
-    report_dict['report_id'] = report_id
-    report_dict['payment_progress_code'] = payment_progress_code
-    report_dict['payment_progress_code_name'] = payment_progress_code_name
-    report_dict['payment_user_id'] = payment_user_id
-    report_dict['payment_user_name'] = payment_user_name
+    if report_id != '':
+        return redirect(url_for('work_report_detail', report_id=report_id))
 
     # 금주 일정 조회
-    work_list = Work().get_work_info(user_id, day_dict['thisweek_start_day'], day_dict['thisweek_end_day'])
+    work_list = Work().get_report_work_info(user_id, day_dict['thisweek_start_day'], day_dict['thisweek_end_day'])
     if work_list['result'] != 'fail':
         work_list = work_list['data']
     else:
         work_list = []
 
     # 차주 계획 조회
-    plan_list = Work().get_plan_info(user_id, day_dict['nextweek_start_day'], day_dict['nextweek_end_day'])
+    plan_list = Work().get_report_plan_info(user_id, day_dict['nextweek_start_day'], day_dict['nextweek_end_day'])
     if plan_list['result'] != 'fail':
         plan_list = plan_list['data']
     else:
         plan_list = []
 
+    auth_dict: dict = defaultdict(lambda: 'N')
+    auth_dict['update_auth'] = 'Y'
+
     return render_template('/work/template_workReportInsert.html', menu_list=menu_list,
                            now_top_menu_code=now_top_menu_code, now_left_menu_code=now_left_menu_code,
                            user_name=user_name, day_dict=day_dict, work_list=work_list,
-                           code_dict=code_dict, report_dict=report_dict,
-                           plan_list=plan_list)
+                           code_dict=code_dict, report_dict=report_dict, user_dict=user_dict,
+                           plan_list=plan_list, auth_dict=auth_dict)
 
 
 # 업무 보고서 상세정보 조회
@@ -160,7 +141,6 @@ def work_report_detail():
     '''
     now_user = current_user
     user_id = now_user.user_id
-    user_name = now_user.user_name
 
     # 메뉴 조회
     menu_list: dict = get_menu_list()
@@ -176,39 +156,35 @@ def work_report_detail():
     # 보고서 관련
     report_id: str = request.args['report_id']
 
-    req_report_dict: dict = Report().get_report_info(report_id)
-    if req_report_dict['result'] == 'fail' or req_report_dict['count'] == 0:
+    report_dict: dict = Report().get_report_info(report_id)
+    if report_dict['result'] == 'fail' or report_dict['count'] == 0:
         return 'alert("존재하지 않은 보고서 입니다.");location.href="/";'
-    req_report_dict = req_report_dict['data'][0]
+    report_dict = report_dict['data'][0]
 
-    report_dict: dict = dict()
-    report_dict['report_id'] = report_id
-    report_dict['payment_progress_code'] = req_report_dict['PAYMENT_PROGRESS_CODE']
-    report_dict['payment_progress_code_name'] = req_report_dict['PAYMENT_PROGRESS_CODE_NAME']
-    report_dict['payment_user_id'] = req_report_dict['PAYMENT_USER_ID']
-    report_dict['payment_user_name'] = req_report_dict['PAYMENT_USER_NAME']
-
-    report_user_id = req_report_dict['USER_ID']
+    user_name = report_dict['USER_NAME']
+    report_user_id = report_dict['USER_ID']
 
     # 금주 일정 조회
-    work_list = Work().get_report_work_info(report_user_id, day_dict['thisweek_start_day'], day_dict['thisweek_end_day'])
+    work_list = Work().get_report_work_info(report_user_id, report_dict['THISWEEK_START_DATETIME'], report_dict['THISWEEK_END_DATETIME'])
     if work_list['result'] != 'fail':
         work_list = work_list['data']
     else:
         work_list = []
 
     # 차주 계획 조회
-    plan_list = Work().get_report_plan_info(report_user_id, day_dict['nextweek_start_day'], day_dict['nextweek_end_day'])
+    plan_list = Work().get_report_plan_info(report_user_id, report_dict['NEXTWEEK_START_DATETIME'], report_dict['NEXTWEEK_END_DATETIME'])
     if plan_list['result'] != 'fail':
         plan_list = plan_list['data']
     else:
         plan_list = []
 
-    auth_dict: dict = {
-        'update_info': 'N',
-    }
-    if user_id == req_report_dict['USER_ID']:
-        auth_dict['update_info'] = 'Y'
+    auth_dict: dict = defaultdict(lambda: 'N')
+    # 보고서를 작성한 사용자인지 확인
+    if user_id == report_dict['USER_ID']:
+        auth_dict['update_auth'] = 'Y'
+    # 결재자인지 확인
+    if user_id == report_dict['PAYMENT_USER_ID']:
+        auth_dict['payment_auth'] = 'Y'
 
     return render_template('/work/template_workReportInsert.html', menu_list=menu_list,
                            now_top_menu_code=now_top_menu_code, now_left_menu_code=now_left_menu_code,
