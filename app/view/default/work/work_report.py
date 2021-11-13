@@ -197,7 +197,7 @@ def work_report_detail():
 def get_date_info() -> dict:
     # 보고서 등록 일자 조회
     today_datetime: datetime = datetime.today()
-    today: str = today_datetime.strftime("%Y-%m-%d")
+    today: str = today_datetime.strftime("%Y-%m-%d %H:%M:%S")
     weekday: int = today_datetime.weekday()
 
     # 금주 날짜 계산

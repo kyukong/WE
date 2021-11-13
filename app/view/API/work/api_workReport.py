@@ -94,9 +94,27 @@ class APIWorkApprovalReport(Resource):
         if not user_info.is_authenticated:
             return {"result": "fail", "context": "login first"}
 
+        body: dict = request.get_json()
+        report_id: str = body['reportID']
+        work_id_list: list = body['workIDList']
+
+        user_id = user_info.user_id
+        his_id = get_ID('HISWRP')
+
         # 업무 상태코드 수정
+        work_state_update_result = Work().upd_work_state_info(work_id_list, 'WRS0004', user_id, his_id)
+        if work_state_update_result['result'] == 'fail':
+            return {'result': 'fail'}
 
         # 보고서 상태코드 및 결재 시간 수정
+        report_dict: dict = dict()
+        report_dict['report_id'] = report_id
+        report_dict['payment_progress_code'] = 'RPS0003'
+        approval_report_result = Report().upd_report_info(report_dict, user_id, his_id)
+        if approval_report_result['result'] == 'fail':
+            return {'result': 'fail'}
+        else:
+            return approval_report_result
 
 
 # 보고서 반려
@@ -119,3 +137,4 @@ class APIWorkReportReturn(Resource):
 
 
 api.add_resource(APIWorkReportInsert, "/api/v1/workReport/insert")
+api.add_resource(APIWorkApprovalReport, "/api/v1/workReport/approval")

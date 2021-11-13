@@ -100,7 +100,8 @@ class Report:
         '''
         result: dict = dict()
         try:
-            sql: str = f"SELECT REPORT_ID, IFNULL(REGISTER_DATETIME, '') AS REGISTER_DATETIME, " \
+            sql: str = f"SELECT REPORT_ID, " \
+                       f"IFNULL(DATE_FORMAT(REGISTER_DATETIME, '%Y-%m-%d %H:%i:%s'), '') AS REGISTER_DATETIME, " \
                        f"IFNULL(USER_ID, '') AS USER_ID, USER_ID AS now_USER_ID, " \
                        f"IFNULL((SELECT USER_NAME FROM tn_user_info WHERE USER_ID = now_USER_ID), '') " \
                        f"AS USER_NAME, " \
@@ -112,12 +113,12 @@ class Report:
                        f"AS PAYMENT_PROGRESS_CODE_NAME, " \
                        f"IFNULL(DATE_FORMAT(PAYMENT_DATETIME, '%Y-%m-%d %H:%i:%s'), '') AS PAYMENT_DATETIME, " \
                        f"IFNULL(PAYMENT_RETURN_CONTENT, '') AS PAYMENT_RETURN_CONTENT, " \
-                       f"IFNULL(DATE_FORMAT(THISWEEK_START_DATETIME, '%Y-%m-%d %H:%i:%s'), '') " \
+                       f"IFNULL(DATE_FORMAT(THISWEEK_START_DATETIME, '%Y-%m-%d'), '') " \
                        f"AS THISWEEK_START_DATETIME, " \
-                       f"IFNULL(DATE_FORMAT(THISWEEK_END_DATETIME, '%Y-%m-%d %H:%i:%s'), '') AS THISWEEK_END_DATETIME, " \
-                       f"IFNULL(DATE_FORMAT(NEXTWEEK_START_DATETIME, '%Y-%m-%d %H:%i:%s'), '') " \
+                       f"IFNULL(DATE_FORMAT(THISWEEK_END_DATETIME, '%Y-%m-%d'), '') AS THISWEEK_END_DATETIME, " \
+                       f"IFNULL(DATE_FORMAT(NEXTWEEK_START_DATETIME, '%Y-%m-%d'), '') " \
                        f"AS NEXTWEEK_START_DATETIME, " \
-                       f"IFNULL(DATE_FORMAT(NEXTWEEK_END_DATETIME, '%Y-%m-%d %H:%i:%s'), '') AS NEXTWEEK_END_DATETIME, " \
+                       f"IFNULL(DATE_FORMAT(NEXTWEEK_END_DATETIME, '%Y-%m-%d'), '') AS NEXTWEEK_END_DATETIME, " \
                        f"IFNULL(INSERT_USER_ID, '') AS INSERT_USER_ID, " \
                        f"IFNULL(DATE_FORMAT(INSERT_DATETIME, '%Y-%m-%d %H:%i:%s'), '') AS INSERT_DATETIME, " \
                        f"IFNULL(UPDATE_USER_ID, '') AS UPDATE_USER_ID, " \
@@ -222,14 +223,16 @@ class Report:
         '''
         result: dict = dict()
         try:
-            # TODO 파라미터에 '반려 내용' 추가
-            #  입력받은 결재 상태값에 따라 REGISTER_DATETIME 를 now()로 할지 아무것도 안할지 수정
-            #  보고서를 작성한 사용자가 선택한 상태값일 경우 now(), 결재자가 선택한 상태값일 경우 X
-            sql = f"UPDATE tn_report_info " \
-                  f"SET REGISTER_DATETIME = now(), " \
-                  f"PAYMENT_PROGRESS_CODE = '{report_dict['payment_progress_code']}', " \
-                  f"UPDATE_USER_ID = '{user_id}', UPDATE_DATETIME = now() " \
-                  f"WHERE REPORT_ID = '{report_dict['report_id']}';"
+            sql: str = f"UPDATE tn_report_info " \
+                  f"SET PAYMENT_PROGRESS_CODE = '{report_dict['payment_progress_code']}', "
+
+            if report_dict['payment_progress_code'] == 'RPS0003':  # 결재완료
+                sql += f"PAYMENT_DATETIME = now(), "
+            elif report_dict['payment_progress_code'] == 'RPS0004':  # 반려
+                sql += f"PAYMENT_DATETIME = now(), PAYMENT_RETURN_CONTENT = '{report_dict['payment_return_content']}', "
+
+            sql += f"UPDATE_USER_ID = '{user_id}', UPDATE_DATETIME = now() " \
+                   f"WHERE REPORT_ID = '{report_dict['report_id']}';"
             his_sql = Report.get_report_his_sql(report_dict['report_id'], his_id, 'UPDATE')
 
             sql += his_sql

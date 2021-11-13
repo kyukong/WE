@@ -6,7 +6,7 @@
 
 {% block js %}
   <script>
-    var reportID = '{{ report_dict['report_id'] }}';
+    var reportID = '{{ report_dict['REPORT_ID'] }}';
     var projectList = {{ code_dict['project_list']|tojson }};
     var dayInfo = {{ day_dict|tojson }};
   </script>
@@ -26,7 +26,13 @@
         <tbody>
           <tr>
             <th>등록일자</th>
-            <td id="REGISTER_DATETIME">{{ day_dict['today'] }}</td>
+            <td id="REGISTER_DATETIME">
+              {% if report_dict %}
+                {{ report_dict['REGISTER_DATETIME'] }}
+              {% else %}
+                {{ day_dict['today'] }}
+              {% endif %}
+            </td>
             <th>보고서 상태</th>
             <td id="PAYMENT_PROGRESS_CODE">
               {% if report_dict %}
@@ -57,11 +63,19 @@
               {% endif %}
             </td>
             <th>결재일자</th>
-            <td></td>
+            <td>
+              {% if report_dict %}
+                {{ report_dict['PAYMENT_DATETIME'] }}
+              {% endif %}
+            </td>
           </tr>
           <tr class="none">
             <th>반려내용</th>
-            <td colspan="3"></td>
+            <td colspan="3">
+              {% if report_dict %}
+                {{ report_dict['PAYMENT_RETURN_CONTENT'] }}
+              {% endif %}
+            </td>
           </tr>
         </tbody>
       </table>
@@ -69,7 +83,12 @@
   </div>
   <div>
     <p class="main_title">
-      금주 업무 ({{ day_dict['thisweek_start_day'] }} ~ {{ day_dict['thisweek_end_day'] }})
+      금주 업무
+      {% if report_dict %}
+        ({{ report_dict['THISWEEK_START_DATETIME'] }} ~ {{ report_dict['THISWEEK_END_DATETIME'] }})
+      {% else %}
+        ({{ day_dict['thisweek_start_day'] }} ~ {{ day_dict['thisweek_end_day'] }})
+      {% endif %}
     <p>
   </div>
   <div id="workTableDiv">
@@ -248,11 +267,11 @@
       {% if not report_dict or report_dict['PAYMENT_PROGRESS_CODE'] == 'RPS0001' %}
         {% if auth_dict and auth_dict['update_auth'] == 'Y' %}
           <input type="button" value="보고서 저장" class="empty_button" onclick="saveReport()">
-          <input type="button" value="보고" class="empty_button" onclick="approvalReport()">
+          <input type="button" value="보고" class="empty_button" onclick="reportReport()">
         {% endif %}
       {% elif report_dict and report_dict['PAYMENT_PROGRESS_CODE'] == 'RPS0002' %}
         {% if auth_dict and auth_dict['payment_auth'] == 'Y' %}
-          <input type="button" value="결재" class="empty_button" onclick="">
+          <input type="button" value="결재" class="empty_button" onclick="approvalReport()">
           <input type="button" value="반려" class="empty_button" onclick="">
         {% endif %}
       {% endif %}

@@ -87,7 +87,7 @@ function saveReport() {
 }
 
 // 보고서 보고
-function approvalReport() {
+function reportReport() {
     var reportInfo = getReportInfo();
     reportInfo['requestType'] = 'report';
 
@@ -116,15 +116,7 @@ function getReportInfo() {
     reportDict['nextweekEndDatetime'] = nextweekEndDatetime;
 
     // 업무 정보 조회
-    var workIDList = [];
-    var workID;
-
-    var workTableDiv = document.getElementById('workTableDiv');
-
-    for (var i = 0; i < workTableDiv.childElementCount; i++) {
-        workID = workTableDiv.children[i].getAttribute('id');
-        workIDList.push(workID);
-    }
+    var workIDList = getWorkInfo();
 
     // 계획 정보 조회
     var planInsertInfoList = [];
@@ -177,20 +169,63 @@ function getReportInfo() {
     return returnData;
 }
 
+// 업무 정보 조회
+function getWorkInfo() {
+    var workIDList = [];
+    var workID;
+
+    var workTableDiv = document.getElementById('workTableDiv');
+
+    for (var i = 0; i < workTableDiv.childElementCount; i++) {
+        workID = workTableDiv.children[i].getAttribute('id');
+        workIDList.push(workID);
+    }
+
+    return workIDList;
+}
+
 // 보고서 등록 API 호출
 function getReportInsertAPI(body) {
     var url = '/api/v1/workReport/insert';
 
     getAPI(url, 'POST', body)
-        .then((result) => {
-            if (result['result'] != 'fail') {
-                var url = "/work/report/insert";
-                getPageGETMethod(url);
-            } else {
-                alert("보고서 저장에 실패하였습니다.");
-            }
-        })
-        .catch((error) => {
-            alert("api error: " + error);
-        })
+    .then((result) => {
+        if (result['result'] != 'fail') {
+            var url = "/work/report/detail";
+            var parameters = 'report_id=' + reportID;
+            getPageGETMethod(url, parameters);
+        } else {
+            alert("보고서 저장에 실패하였습니다.");
+        }
+    })
+    .catch((error) => {
+        alert("api error: " + error);
+    })
+}
+
+// 보고서 결재
+function approvalReport() {
+    var reportInfo = {};
+    reportInfo['reportID'] = reportID;
+    reportInfo['workIDList'] = getWorkInfo();
+    getReportApprovalAPI(reportInfo);
+}
+
+// 보고서 결재 API 호출
+function getReportApprovalAPI(body) {
+    var url = '/api/v1/workReport/approval';
+
+    getAPI(url, 'POST', body)
+    .then((result) => {
+        if (result['result'] != 'fail') {
+            var url = "/work/report/detail";
+            var parameters = 'report_id=' + reportID;
+            getPageGETMethod(url, parameters);
+        } else {
+            alert("보고서 결재에 실패하였습니다.");
+        }
+    })
+    .catch((error) => {
+        alert("api error: " + error);
+    })
 }
