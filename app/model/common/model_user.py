@@ -65,28 +65,22 @@ class User(UserMixin):
 
     # 사용자 정보 보고서 정보 수정
     @staticmethod
-    def upd_user_report_info(user_id: str, his_id: str, thisweek_report_id: str = '', lastweek_report_info: str = ''):
+    def upd_user_report_info(user_id: str, update_user_id: str, his_id: str, thisweek_report_id: str = ''):
         '''
         사용자 보고서 관련 정보 수정
         :param user_id: 사용자 ID
+        :param update_user_id: 정보를 수정한(요청한) 사용자 ID
         :param his_id: 이력 ID
         :param thisweek_report_id: 금주 보고서 ID (필수X)
-        :param lastweek_report_info: 전주 보고서 ID (필수X)
         :return:
         '''
         result: dict = dict()
         try:
-            if thisweek_report_id == '' and lastweek_report_info == '':
-                return {'result': 'fail'}
-
             sql: str = f"UPDATE tn_user_info "
+            set_sql: str = f"SET UPDATE_USER_ID = '{update_user_id}', UPDATE_DATETIME = now() "
 
-            set_sql: str = f"SET UPDATE_USER_ID = '{user_id}', UPDATE_DATETIME = now() "
-
-            if thisweek_report_id != '':
-                set_sql += f", THISWEEK_REPORT_ID = '{thisweek_report_id}' "
-            if lastweek_report_info != '':
-                set_sql += f", LASTWEEK_REPORT_ID = '{lastweek_report_info}' "
+            if thisweek_report_id == '':
+                set_sql += f", THISWEEK_REPORT_ID = NULL "
 
             his_sql: str = User().get_user_his_sql(user_id, his_id, 'UPDATE')
             sql += set_sql + f"WHERE USER_ID = '{user_id}';" + his_sql

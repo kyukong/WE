@@ -36,3 +36,16 @@ textarea { resize: none; }
 .center_column_button_wrap { display: flex; flex-direction: column; }
 .center_column_button_wrap input { margin: 5px auto; padding: 10px; width: 70%; border: none; background-color: #4EC2A9; color: white; font-weight: bold; font-size: 15px; border-radius: 4px; cursor: pointer; }
 
+/* popup */
+.popup { display: none; z-index: 1; width: 100%; height: 100%; background-color: rgba(0,0,0,0.2); position: fixed; left: 0; top: 0; }
+.popup.on { display: block; }
+.popup .content { width: 50%; background-color: #fefefe; margin: 200px auto; }
+.popup .content .top { height: 30px; padding: 20px; font-weight: bold; background-color: #4EC2A9; color: white; font-size: 14pt; }
+.popup .content .top div { display: inline-block; }
+.popup .content .top .popup_close { float: right; cursor: pointer; }
+.popup .content .bottom { padding: 20px; }
+.popup .content .bottom .popup_sub_title { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+.popup textarea { outline: none; }
+.popup .button_wrap { height: 30px; }
+.popup .button { float: right; border: none; padding: 5px 20px; margin-top: 5px; cursor: pointer; }
+

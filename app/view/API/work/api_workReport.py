@@ -75,7 +75,7 @@ class APIWorkReportInsert(Resource):
             return {'result': 'fail'}
 
         # 사용자 정보 수정
-        user_update_result = User().upd_user_report_info(user_id, his_id, thisweek_report_id=report_dict['report_id'])
+        user_update_result = User().upd_user_report_info(user_id, user_id, his_id, thisweek_report_id=report_dict['report_id'])
         if user_update_result['result'] == 'fail':
             return {'result': 'fail'}
         else:
@@ -129,12 +129,42 @@ class APIWorkReportReturn(Resource):
         if not user_info.is_authenticated:
             return {"result": "fail", "context": "login first"}
 
+        body: dict = request.get_json()
+        report_id: str = body['reportID']
+        work_id_list: list = body['workIDList']
+        payment_return_content: str = body['reportReturnContent']
+
+        update_user_id: str = user_info.user_id
+        his_id: str = get_ID('HISWRP')
+
         # 업무 상태코드 수정
+        work_state_update_result = Work().upd_work_state_info(work_id_list, 'WRS0001', update_user_id, his_id)
+        if work_state_update_result['result'] == 'fail':
+            return {'result': 'fail'}
 
         # 보고서 상태코드 및 결재시간, 반려 내용 수정
+        report_dict: dict = dict()
+        report_dict['report_id'] = report_id
+        report_dict['payment_progress_code'] = 'RPS0004'
+        report_dict['payment_return_content'] = payment_return_content
+        approval_report_result = Report().upd_report_info(report_dict, update_user_id, his_id)
+        if approval_report_result['result'] == 'fail':
+            return {'result': 'fail'}
+
+        # 보고서를 작성한 사용자 정보 조회
+        report_info = Report().get_report_info(report_id)
+        if report_info['result'] == 'fail':
+            return {'result': 'fail'}
+        report_user_id: str = report_info['data'][0]['USER_ID']
 
         # 사용자 이번주 보고서 정보 수정
+        user_update_result = User().upd_user_report_info(report_user_id, update_user_id, his_id, thisweek_report_id='')
+        if user_update_result['result'] == 'fail':
+            return {'result': 'fail'}
+        else:
+            return user_update_result
 
 
 api.add_resource(APIWorkReportInsert, "/api/v1/workReport/insert")
 api.add_resource(APIWorkApprovalReport, "/api/v1/workReport/approval")
+api.add_resource(APIWorkReportReturn, "/api/v1/workReport/return")

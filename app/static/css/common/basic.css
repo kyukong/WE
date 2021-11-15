@@ -26,7 +26,7 @@ body { margin: 0; }
 .top_menu_wrap li.on { color: #4EC2A9; }
 
 /* 하단 */
-.bottom { flex: 1; display: flex; }
+.root > .bottom { flex: 1; display: flex; }
 
 .left_menu { width: 15vw; }
 

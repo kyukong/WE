@@ -1,9 +1,9 @@
-from flask import render_template, redirect, request
+from flask import render_template, request
 from flask_login import current_user
 from app import app
 from flask_login import login_required
+from collections import defaultdict
 
-from app.model.common.model_menu import Menu
 from app.model.common.model_code import Code
 from app.model.work.model_project import Project
 from app.model.work.model_work import Work
@@ -92,15 +92,14 @@ def work_detail(day):
     else:
         work_state_code_list = []
     
-    # 20211004 KYB add 계획 정보 조회
+    # 계획 정보 조회
     plan_list = Work().get_plan_info(user_id, day)
     if plan_list['result'] != 'fail':
         plan_list = plan_list['data']
     else:
         plan_list = []
 
-    # TODO KYB 업무 상태 정보 확인하여 '보고' 인 것은 수정할 수 없도록 비활성화
-    # 20211004 KYB add 업무 정보 조회
+    # 업무 정보 조회
     work_list = Work().get_work_info(user_id, day)
     if work_list['result'] != 'fail':
         work_list = work_list['data']

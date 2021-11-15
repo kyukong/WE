@@ -229,3 +229,37 @@ function getReportApprovalAPI(body) {
         alert("api error: " + error);
     })
 }
+
+// 보고서 반려 팝업 생성
+function getReportReturnPopup() {
+    var reportReturnContentPopupEle = document.getElementById('reportReturnContentPopup');
+    reportReturnContentPopupEle.classList.add("on");
+}
+
+// 보고서 반려
+function returnReport() {
+    var reportInfo = {};
+    reportInfo['reportID'] = reportID;
+    reportInfo['workIDList'] = getWorkInfo();
+    reportInfo['reportReturnContent'] = document.getElementById('reportReturnContent').value;
+    getReportReturnAPI(reportInfo);
+}
+
+// 보고서 반려 API 호출
+function getReportReturnAPI(body) {
+     var url = '/api/v1/workReport/return';
+
+     getAPI(url, 'POST', body)
+     .then((result) => {
+         if (result['result'] != 'fail') {
+             var url = "/work/report/detail";
+             var parameters = 'report_id=' + reportID;
+             getPageGETMethod(url, parameters);
+         } else {
+             alert("보고서 반려에 실패하였습니다.");
+         }
+     })
+     .catch((error) => {
+         alert("api error: " + error);
+     })
+ }

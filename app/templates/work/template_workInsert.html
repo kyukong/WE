@@ -137,7 +137,6 @@
         <div>
             <!-- 업무 일정 -->
             <div id="workTableDiv">
-                {# 20211004 KYB add 작성한 업무가 있을 경우 업무 정보 추가 #}
                 {% if work_list %}
                     {% for work_info in work_list %}
                         <table class="row_table" id="{{ work_info['WORK_ID'] }}" data-oriflag=true>
@@ -153,7 +152,11 @@
                                     <th>프로젝트명</th>
                                     <td>
                                         <label for="project_code"></label>
-                                        <select name="project_code" id="projectCode" class="input_select">
+                                        <select name="project_code" id="projectCode" class="input_select"
+                                                {% if work_info['WORK_STATE_CODE'] == 'WRS0003' or work_info['WORK_STATE_CODE'] == 'WRS0004' %}
+                                                disabled
+                                                {% endif %}
+                                        >
                                             {% if project_list %}
                                                 {% for project_info in project_list %}
                                                     {% if project_info['PROJECT_ID'] == work_info['PROJECT_ID'] %}
@@ -165,11 +168,13 @@
                                             {% endif %}
                                         </select>
                                     </td>
-                                    <td rowspan="6">
-                                        <div class="center_column_button_wrap">
-                                            <input type="button" value="업무 삭제" onclick="delInfoTable(this, 'work')">
-                                        </div>
-                                    </td>
+                                    {% if work_info['WORK_STATE_CODE'] != 'WRS0003' and work_info['WORK_STATE_CODE'] != 'WRS0004' %}
+                                        <td rowspan="6">
+                                            <div class="center_column_button_wrap">
+                                                <input type="button" value="업무 삭제" onclick="delInfoTable(this, 'work')">
+                                            </div>
+                                        </td>
+                                    {% endif %}
                                 </tr>
                                 {% if work_info['PLAN'] %}
                                     <tr>
@@ -178,14 +183,22 @@
                                 {% endif %}
                                         <th>계획</th>
                                         <td>
-                                            <input type="text" id="plan" class="input_text" value="{{ work_info['PLAN'] }}">
+                                            <input type="text" id="plan" class="input_text" value="{{ work_info['PLAN'] }}"
+                                            {% if work_info['WORK_STATE_CODE'] == 'WRS0003' or work_info['WORK_STATE_CODE'] == 'WRS0004' %}
+                                                readonly
+                                            {% endif %}
+                                            >
                                         </td>
                                     </tr>
                                 <tr>
                                     <th>진행여부</th>
                                     <td>
                                         <label for="work_state_code"></label>
-                                        <select name="work_state_code" id="workStateCode" class="input_select">
+                                        <select name="work_state_code" id="workStateCode" class="input_select"
+                                                {% if work_info['WORK_STATE_CODE'] == 'WRS0003' or work_info['WORK_STATE_CODE'] == 'WRS0004' %}
+                                                disabled
+                                                {% endif %}
+                                        >
                                             {% if code_list['work_state_code_list'] %}
                                                 {% for work_state_code_info in code_list['work_state_code_list'] %}
                                                     {% if work_state_code_info['CODE'] == work_info['WORK_PROGRESS_CODE'] %}
@@ -201,37 +214,56 @@
                                 <tr>
                                     <th>진행사항</th>
                                     <td>
-                                        <textarea type="text" id="workContent" class="input_text" rows="3">{{ work_info['WORK_CONTENT'] }}</textarea>
+                                        <textarea type="text" id="workContent" class="input_text" rows="3"
+                                                  {% if work_info['WORK_STATE_CODE'] == 'WRS0003' or work_info['WORK_STATE_CODE'] == 'WRS0004' %}
+                                                    readonly
+                                                    {% endif %}
+                                        >{{ work_info['WORK_CONTENT'] }}</textarea>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>지연사유</th>
                                     <td>
-                                        <textarea type="text" id="delayContent" class="input_text" rows="3">{{ work_info['DELAY_CONTENT'] }}</textarea>
+                                        <textarea type="text" id="delayContent" class="input_text" rows="3"
+                                                  {% if work_info['WORK_STATE_CODE'] == 'WRS0003' or work_info['WORK_STATE_CODE'] == 'WRS0004' %}
+                                                    readonly
+                                                {% endif %}
+                                        >{{ work_info['DELAY_CONTENT'] }}</textarea>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>해결방안</th>
                                     <td>
-                                        <textarea type="text" id="solutionContent" class="input_text" rows="3">{{ work_info['SOLUTION_CONTENT'] }}</textarea>
+                                        <textarea type="text" id="solutionContent" class="input_text" rows="3"
+                                                  {% if work_info['WORK_STATE_CODE'] == 'WRS0003' or work_info['WORK_STATE_CODE'] == 'WRS0004' %}
+                                                    readonly
+                                                {% endif %}
+                                        >{{ work_info['SOLUTION_CONTENT'] }}</textarea>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>비고</th>
                                     <td>
-                                        <textarea type="text" id="memo" class="input_text" rows="3">{{ work_info['MEMO'] }}</textarea>
+                                        <textarea type="text" id="memo" class="input_text" rows="3"
+                                                  {% if work_info['WORK_STATE_CODE'] == 'WRS0003' or work_info['WORK_STATE_CODE'] == 'WRS0004' %}
+                                                    readonly
+                                                {% endif %}
+                                        >{{ work_info['MEMO'] }}</textarea>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>산출물 업로드 경로</th>
                                     <td>
-                                        <input type="text" id="ftpPath" class="input_text" value="{{ work_info['FTP_PATH'] }}">
+                                        <input type="text" id="ftpPath" class="input_text" value="{{ work_info['FTP_PATH'] }}"
+                                               {% if work_info['WORK_STATE_CODE'] == 'WRS0003' or work_info['WORK_STATE_CODE'] == 'WRS0004' %}
+                                                readonly
+                                                {% endif %}
+                                        >
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     {% endfor %}
-                {# 20211004 KYB exp 이전에 작성한 업무 정보가 없을 경우 빈 테이블 추가 #}
                 {% else %}
                     <table class="row_table" data-oriflag=false>
                         <thead>

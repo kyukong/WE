@@ -13,6 +13,10 @@
   <script type="text/javascript" src="/static/js/work/workReportInsert.js"></script>
 {% endblock %}
 
+{% block popup %}
+  {% include "work/tile/tile_reportReturnPopup.html" %}
+{% endblock %}
+
 {% block content %}
   <div>
     <div>
@@ -69,10 +73,14 @@
               {% endif %}
             </td>
           </tr>
-          <tr class="none">
+          {% if report_dict and report_dict['PAYMENT_PROGRESS_CODE'] == 'RPS0004' %}
+            <tr>
+          {% else %}
+            <tr class="none">
+          {% endif %}
             <th>반려내용</th>
             <td colspan="3">
-              {% if report_dict %}
+              {% if report_dict and report_dict['PAYMENT_PROGRESS_CODE'] == 'RPS0004' %}
                 {{ report_dict['PAYMENT_RETURN_CONTENT'] }}
               {% endif %}
             </td>
@@ -272,7 +280,7 @@
       {% elif report_dict and report_dict['PAYMENT_PROGRESS_CODE'] == 'RPS0002' %}
         {% if auth_dict and auth_dict['payment_auth'] == 'Y' %}
           <input type="button" value="결재" class="empty_button" onclick="approvalReport()">
-          <input type="button" value="반려" class="empty_button" onclick="">
+          <input type="button" value="반려" class="empty_button" onclick="getReportReturnPopup()">
         {% endif %}
       {% endif %}
     </div>
