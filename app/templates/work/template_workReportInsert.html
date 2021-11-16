@@ -1,7 +1,6 @@
 {% extends '/common/layout/layout_basic.html' %}
 
 {% block css %}
-  <link rel="stylesheet" type="text/css" href="/static/css/common/common.css">
 {% endblock %}
 
 {% block js %}
@@ -104,19 +103,15 @@
       {% for work_info in work_list %}
         <table class="row_table" id="{{ work_info['WORK_ID'] }}" data-oriflag=true>
           <colgroup>
-            <col style="width: 20%">
-            <col style="width: 60%">
+            <col style="width: 10%">
+            <col style="width: 10%">
+            <col style="width: 10%">
+            <col style="width: 10%">
           </colgroup>
           <tbody>
           <tr>
-            <th>업무일자</th>
-            <td>
-              <input type="text" id="workDate" class="input_text" value="{{ work_info['WORK_DATE'] }}" readonly>
-            </td>
-          </tr>
-          <tr>
             <th>프로젝트명</th>
-            <td>
+            <td colspan="3">
               <label for="project_code"></label>
               <select name="project_code" id="projectCode" class="input_select" disabled>
                 {% if code_dict['project_list'] %}
@@ -131,36 +126,40 @@
               </select>
             </td>
           </tr>
+          <tr>
+            <th>업무일자</th>
+            <td>
+              <input type="text" id="workDate" class="input_text" value="{{ work_info['WORK_DATE'] }}" readonly>
+            </td>
+            <th>진행여부</th>
+            <td>
+              <label for="work_state_code"></label>
+              <select name="work_state_code" id="workStateCode" class="input_select" disabled>
+                {% if code_dict['work_state_code_dict'] %}
+                {% for work_state_code_info in code_dict['work_state_code_list'] %}
+                {% if work_state_code_info['CODE'] == work_info['WORK_PROGRESS_CODE'] %}
+                <option value="{{ work_state_code_info['CODE'] }}" selected>{{ work_state_code_info['CODE_NAME'] }}</option>
+                {% else %}
+                <option value="{{ work_state_code_info['CODE'] }}">{{ work_state_code_info['CODE_NAME'] }}</option>
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+              </select>
+            </td>
+          </tr>
           {% if work_info['PLAN'] %}
             <tr>
           {% else %}
             <tr class="none">
           {% endif %}
             <th>계획</th>
-            <td>
+            <td colspan="3">
               <input type="text" id="plan" class="input_text" value="{{ work_info['PLAN'] }}" readonly>
             </td>
           </tr>
           <tr>
-            <th>진행여부</th>
-            <td>
-              <label for="work_state_code"></label>
-              <select name="work_state_code" id="workStateCode" class="input_select" disabled>
-                {% if code_dict['work_state_code_dict'] %}
-                  {% for work_state_code_info in code_dict['work_state_code_list'] %}
-                    {% if work_state_code_info['CODE'] == work_info['WORK_PROGRESS_CODE'] %}
-                      <option value="{{ work_state_code_info['CODE'] }}" selected>{{ work_state_code_info['CODE_NAME'] }}</option>
-                    {% else %}
-                      <option value="{{ work_state_code_info['CODE'] }}">{{ work_state_code_info['CODE_NAME'] }}</option>
-                    {% endif %}
-                  {% endfor %}
-                {% endif %}
-              </select>
-            </td>
-          </tr>
-          <tr>
             <th>진행사항</th>
-            <td>
+            <td colspan="3">
               <textarea id="workContent" class="input_text" rows="3" readonly>{{ work_info['WORK_CONTENT'] }}</textarea>
             </td>
           </tr>
@@ -170,8 +169,6 @@
               <textarea id="delayContent" class="input_text"
                         rows="3" readonly>{{ work_info['DELAY_CONTENT'] }}</textarea>
             </td>
-          </tr>
-          <tr>
             <th>해결방안</th>
             <td>
               <textarea id="solutionContent" class="input_text"
@@ -181,10 +178,8 @@
           <tr>
             <th>비고</th>
             <td>
-              <textarea id="memo" class="input_text" rows="3" readonly>{{ work_info['MEMO'] }}</textarea>
+              <input type="text" id="memo" class="input_text" value="{{ work_info['MEMO'] }}" readonly>
             </td>
-          </tr>
-          <tr>
             <th>산출물 업로드 경로</th>
             <td>
               <input type="text" id="ftpPath" class="input_text" value="{{ work_info['FTP_PATH'] }}" readonly>
@@ -208,52 +203,51 @@
           <table class="row_table" id="{{ plan_info['PLAN_ID'] }}" data-oriflag=true data-plan_day="{{ plan_info['PLAN_DATE'] }}">
             <thead>
             <colgroup>
-              <col style="width: 20%">
-              <col style="width: 60%">
-              <col style="width: 20%">
+              <col width="10%">
+              <col width="10%">
+              <col width="10%">
+              <col width="10%">
             </colgroup>
             </thead>
             <tbody>
+            {% if auth_dict['update_auth'] == 'Y' %}
+              <tr>
+                <td colspan="4">
+                  <img src="/static/images/icon/delete.png" alt="삭제버튼" id="planDeleteBtn" class="delete_btn" onclick="delInfoTable(this, 'plan')">
+                </td>
+              </tr>
+            {% endif %}
             <tr>
               <th>계획일자</th>
               <td>
                 <input type="text" id="planDate" class="input_text" value="{{ plan_info['PLAN_DATE'] }}">
               </td>
-            </tr>
-            <tr>
               <th>프로젝트명</th>
               <td>
                 <label for="project_code"></label>
                 <select name="project_code" id="projectCode" class="input_select">
                   {% if code_dict['project_list'] %}
-                    {% for project_info in code_dict['project_list'] %}
-                      {% if project_info['PROJECT_ID'] == plan_info['PROJECT_ID'] %}
-                        <option value="{{ project_info['PROJECT_ID'] }}" selected>{{ project_info['PROJECT_NAME'] }}</option>
-                      {% else %}
-                        <option value="{{ project_info['PROJECT_ID'] }}">{{ project_info['PROJECT_NAME'] }}</option>
-                      {% endif %}
-                    {% endfor %}
+                  {% for project_info in code_dict['project_list'] %}
+                  {% if project_info['PROJECT_ID'] == plan_info['PROJECT_ID'] %}
+                  <option value="{{ project_info['PROJECT_ID'] }}" selected>{{ project_info['PROJECT_NAME'] }}</option>
+                  {% else %}
+                  <option value="{{ project_info['PROJECT_ID'] }}">{{ project_info['PROJECT_NAME'] }}</option>
+                  {% endif %}
+                  {% endfor %}
                   {% endif %}
                 </select>
               </td>
-              {% if auth_dict['update_auth'] == 'Y' %}
-                <td rowspan="3">
-                  <div class="center_column_button_wrap">
-                    <input type="button" value="계획 삭제" onclick="delInfoTable(this, 'plan')">
-                  </div>
-                </td>
-              {% endif %}
             </tr>
             <tr>
               <th>계획</th>
-              <td>
+              <td colspan="3">
                 <input type="text" id="plan" class="input_text" value="{{ plan_info['PLAN'] }}">
               </td>
             </tr>
             <tr>
               <th>비고</th>
-              <td>
-                <textarea type="text" id="memo" class="input_text" rows="3">{{ plan_info['MEMO'] }}</textarea>
+              <td colspan="3">
+                <input type="text" id="memo" class="input_text" value="{{ plan_info['MEMO'] }}">
               </td>
             </tr>
             </tbody>

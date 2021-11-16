@@ -16,15 +16,22 @@ function getPlanTable() {
     html += '            <table class="row_table" data-oriflag=false>';
     html += '                <thead>';
     html += '                    <colgroup>';
-    html += '                        <col style="width: 20%">';
-    html += '                        <col style="width: 60%">';
-    html += '                        <col style="width: 20%">';
+    html += '                        <col width="10%">';
+    html += '                        <col width="10%">';
+    html += '                        <col width="10%">';
+    html += '                        <col width="10%">';
     html += '                    </colgroup>';
     html += '                </thead>';
     html += '                <tbody>';
+    html += '<tr>';
+    html += '<td colspan="4">';
+    html += '<img src="/static/images/icon/delete.png" alt="삭제버튼" id="planDeleteBtn" class="delete_btn" onclick="delInfoTable(this)">';
+    html += '<img src="/static/images/icon/add.png" alt="업무등록버튼" id="planAddBtn" class="add_btn" onclick="setPlanTable(this)">';
+    html += '</td>';
+    html += '</tr>';
     html += '                    <tr>';
     html += '                        <th>프로젝트명</th>';
-    html += '                        <td>';
+    html += '                        <td colspan="3">';
     html += '                            <label for="project_code"></label>';
     html += '                            <select name="project_code" id="projectCode" class="input_select">'
 
@@ -36,23 +43,17 @@ function getPlanTable() {
 
     html += '                            </select>';
     html += '                        </td>';
-    html += '                        <td rowspan="3">';
-    html += '                            <div class="center_column_button_wrap">';
-    html += '                                <input type="button" value="업무 등록" onclick="setPlanTable(this)">';
-    html += '                                <input type="button" value="계획 삭제" onclick="delInfoTable(this)">';
-    html += '                            </div>';
-    html += '                        </td>';
     html += '                    </tr>';
     html += '                    <tr>';
     html += '                        <th>계획</th>';
-    html += '                        <td>';
+    html += '                        <td colspan="3">';
     html += '                            <input type="text" id="plan" class="input_text">';
     html += '                        </td>';
     html += '                    </tr>';
     html += '                    <tr>';
     html += '                        <th>비고</th>';
-    html += '                        <td>';
-    html += '                            <textarea type="text" id="memo" class="input_text" rows="3"></textarea>';
+    html += '                        <td colspan="3">';
+    html += '                            <input type="text" id="memo" class="input_text">';
     html += '                        </td>';
     html += '                    </tr>';
     html += '                </tbody>';
@@ -82,12 +83,18 @@ function getWorkTable(project=false, plan=false, memo=false) {
     html += '            <table class="row_table" data-oriflag=false>';
     html += '                <thead>';
     html += '                    <colgroup>';
-    html += '                        <col style="width: 20%">';
-    html += '                        <col style="width: 60%">';
-    html += '                        <col style="width: 20%">';
+    html += '                        <col width="10%">';
+    html += '                        <col width="10%">';
+    html += '                        <col width="10%">';
+    html += '                        <col width="10%">';
     html += '                    </colgroup>';
     html += '                </thead>';
     html += '                <tbody>';
+    html += '<tr>';
+    html += '<td colspan="4">';
+    html += '<img src="/static/images/icon/delete.png" alt="삭제버튼" id="workDeleteBtn" class="delete_btn" onclick="delInfoTable(this)">';
+    html += '</td>';
+    html += '</tr>';
     html += '                    <tr>';
     html += '                        <th>프로젝트명</th>';
     html += '                        <td>';
@@ -106,31 +113,6 @@ function getWorkTable(project=false, plan=false, memo=false) {
 
     html += '                            </select>';
     html += '                        </td>';
-    html += '                        <td rowspan="6">';
-    html += '                            <div class="center_column_button_wrap">';
-    html += '                                <input type="button" value="업무 삭제" onclick="delInfoTable(this)">';
-    html += '                            </div>';
-    html += '                        </td>';
-    html += '                    </tr>';
-
-    if (plan) {
-        html += '                    <tr>';
-    } else {
-        html += '                    <tr class="none">';
-    }
-    html += '                        <th>계획</th>';
-    html += '                        <td>';
-    html += '                            <input type="text" id="plan" class="input_text" value="';
-
-    if (plan) {
-        html += plan;
-    }
-
-    html += '">';
-    html += '                        </td>';
-    html += '                    </tr>';
-
-    html += '                    <tr>';
     html += '                        <th>진행여부</th>';
     html += '                        <td>';
     html += '                            <label for="work_state_code"></label>';
@@ -144,10 +126,33 @@ function getWorkTable(project=false, plan=false, memo=false) {
 
     html += '                            </select>';
     html += '                        </td>';
+//    html += '                        <td rowspan="6">';
+//    html += '                            <div class="center_column_button_wrap">';
+//    html += '                                <input type="button" value="업무 삭제" onclick="delInfoTable(this)">';
+//    html += '                            </div>';
+//    html += '                        </td>';
     html += '                    </tr>';
+
+    if (plan) {
+        html += '                    <tr>';
+    } else {
+        html += '                    <tr class="none">';
+    }
+    html += '                        <th>계획</th>';
+    html += '                        <td colspan="3">';
+    html += '                            <input type="text" id="plan" class="input_text" value="';
+
+    if (plan) {
+        html += plan;
+    }
+
+    html += '">';
+    html += '                        </td>';
+    html += '                    </tr>';
+
     html += '                    <tr>';
     html += '                        <th>진행사항</th>';
-    html += '                        <td>';
+    html += '                        <td colspan="3">';
     html += '                            <textarea type="text" id="workContent" class="input_text" rows="3"></textarea>';
     html += '                        </td>';
     html += '                    </tr>';
@@ -156,8 +161,6 @@ function getWorkTable(project=false, plan=false, memo=false) {
     html += '                        <td>';
     html += '                            <textarea type="text" id="delayContent" class="input_text" rows="3"></textarea>';
     html += '                        </td>';
-    html += '                    </tr>';
-    html += '                    <tr>';
     html += '                        <th>해결방안</th>';
     html += '                        <td>';
     html += '                            <textarea type="text" id="solutionContent" class="input_text" rows="3"></textarea>';
@@ -166,14 +169,12 @@ function getWorkTable(project=false, plan=false, memo=false) {
     html += '                    <tr>';
     html += '                        <th>비고</th>';
     html += '                        <td>';
-    html += '                            <textarea type="text" id="memo" class="input_text" rows="3">';
+    html += '                            <input type="text" id="memo" class="input_text"';
 
-    if (memo) { html += memo; }
+    if (memo) { html += ' value="' + memo + '"'; }
 
-    html += '</textarea>';
+    html += '>';
     html += '                        </td>';
-    html += '                    </tr>';
-    html += '                    <tr>';
     html += '                        <th>산출물 업로드 경로</th>';
     html += '                        <td>';
     html += '                            <input type="text" id="ftpPath" class="input_text">';

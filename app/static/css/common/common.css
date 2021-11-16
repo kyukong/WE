@@ -1,46 +1,47 @@
-/* 20210918 KYB add 모든 화면에 공통적으로 사용되는 css */
+
 /* 태그 */
 textarea { resize: none; }
 
 /* 기본 클래스 */
 .none { display: none; }
 
-.main_title { font-size: 25px; font-weight: bold; width: fit-content; }
-.sub_title { font-weight: bold; display: inline-block; }
+.main_title { font-size: 18px; width: fit-content; }
+.sub_title { font-weight: bold; display: inline-block; margin-bottom: 0; }
 
 /* 테이블 */
-.row_table { width: 100%; border: solid #f2f2f2 2px; padding: 10px; margin: auto; margin-bottom: 20px; }
-.row_table th { padding: 10px; font-size: 18px; }
-/* .row_table td { padding: 10px; } */
+.row_table { width: 100%; border: solid #f2f2f2 1px; padding: 10px; margin: auto; margin-bottom: 20px; }
+.row_table th { padding: 10px; }
+.row_table .add_btn { width: 10px; float: right; margin: 6px; cursor: pointer; }
+.row_table .delete_btn { width: 10px; float: right; margin: 6px; cursor: pointer; }
 
-.col_table { width: 100%; border: solid #f2f2f2 2px; padding: 10px; margin: auto; }
+.col_table { width: 100%; border: solid #f2f2f2 1px; padding: 10px; margin: auto; }
 .col_table th { padding: 10px; font-size: 18px; }
 .col_table td { padding: 10px; text-align: center; cursor: pointer; }
 
 /* input */
-.input_text { width: 100%; padding: 7px 0px 7px 7px; /* font-size: 18px; */ outline: none; border: solid #f2f2f2 2px; border-radius: 5px; }
-.input_text.datetime { width: 47%; padding: 7px 0px 7px 7px; font-size: 18px; outline: none; border: solid #f2f2f2 2px; border-radius: 5px; }
-.input_text:focus { border: solid #4EC2A9 2px; }
+.input_text { width: 100%; padding: 7px 0px 7px 7px; outline: none; border: solid #dddddd 1px; }
+.input_text.datetime { width: 48%; padding: 7px 0px 7px 7px; font-size: 18px; outline: none; border: solid #dddddd 1px; }
+.input_text:focus { border: solid var(--main_color) 1px; }
 
-.input_select { width: 100%; padding: 7px; font-size: 15px; outline: none; border: solid #f2f2f2 2px; border-radius: 5px; }
-.input_select:focus { border: solid #4EC2A9 2px; }
+.input_select { width: 100%; padding: 7px; font-size: 15px; outline: none; border: solid #dddddd 1px; }
+.input_select:focus { border: solid var(--main_color) 1px; }
 
 /* button */
-.color_button { border: none; padding: 10px 50px; color: white; font-size: 15px; font-weight: bold; background-color: #4EC2A9; cursor: pointer; }
-.empty_button { border: #4EC2A9 1px solid; padding: 10px 50px; color: #4EC2A9; font-size: 15px; font-weight: bold; background-color: white; cursor: pointer; margin: 0 10px 0px 10px; }
+.color_button { border: none; padding: 10px 50px; color: white; font-size: 15px; font-weight: bold; background-color: var(--main_color); cursor: pointer; }
+.empty_button { border: var(--main_color) 1px solid; padding: 10px 50px; color: var(--main_color); font-size: 15px; font-weight: bold; background-color: white; cursor: pointer; margin: 0 10px 0px 10px; }
 .empty_button:hover { color: #2CA389; border: #2CA389 1px solid; }
 
 /* button_wrap */
 .center_button_wrap { text-align: center; margin-bottom: 50px; }
 .right_button_wrap { text-align: right; }
 .center_column_button_wrap { display: flex; flex-direction: column; }
-.center_column_button_wrap input { margin: 5px auto; padding: 10px; width: 70%; border: none; background-color: #4EC2A9; color: white; font-weight: bold; font-size: 15px; border-radius: 4px; cursor: pointer; }
+.center_column_button_wrap input { margin: 5px auto; padding: 10px; width: 70%; border: none; background-color: var(--main_color); color: white; font-weight: bold; font-size: 15px; border-radius: 4px; cursor: pointer; }
 
 /* popup */
 .popup { display: none; z-index: 1; width: 100%; height: 100%; background-color: rgba(0,0,0,0.2); position: fixed; left: 0; top: 0; }
 .popup.on { display: block; }
 .popup .content { width: 50%; background-color: #fefefe; margin: 200px auto; }
-.popup .content .top { height: 30px; padding: 20px; font-weight: bold; background-color: #4EC2A9; color: white; font-size: 14pt; }
+.popup .content .top { height: 30px; padding: 20px; font-weight: bold; background-color: var(--main_color); color: white; font-size: 14pt; }
 .popup .content .top div { display: inline-block; }
 .popup .content .top .popup_close { float: right; cursor: pointer; }
 .popup .content .bottom { padding: 20px; }

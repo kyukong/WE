@@ -1,0 +1,5 @@
+
+/* 모바일 */
+@media (max-width: 500px) {
+    .input_text.datetime { width: 46%; }
+}

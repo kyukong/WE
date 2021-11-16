@@ -180,7 +180,7 @@ def work_report_detail():
 
     auth_dict: dict = defaultdict(lambda: 'N')
     # 보고서를 작성한 사용자인지 확인
-    if user_id == report_dict['USER_ID']:
+    if user_id == report_dict['USER_ID'] and report_dict['PAYMENT_PROGRESS_CODE'] == 'RPS0001':
         auth_dict['update_auth'] = 'Y'
     # 결재자인지 확인
     if user_id == report_dict['PAYMENT_USER_ID']:

@@ -4,4 +4,4 @@
 .page_wrap { text-align: center; }
 .page_wrap ul { padding: 0; display: flex; justify-content: center; }
 .page_wrap li { list-style: none; width: fit-content; padding: 10px; cursor: pointer; }
-.page_wrap li.on { color: #4EC2A9; font-weight: bold; }
+.page_wrap li.on { color: var(--main_color); font-weight: bold; }
