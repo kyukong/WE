@@ -4,6 +4,9 @@ from app.config import DB
 
 
 def connect():
+    if hasattr(g, 'conn'):
+        return
+
     conn = pymysql.connect(
         host=DB['host'], 
         port=DB['port'], 
@@ -32,6 +35,7 @@ def close():
     if hasattr(g, "conn"):
         conn = getattr(g, "conn")
         conn.close()
+        delattr(g, 'conn')
 
 
 def select(sql):
@@ -51,7 +55,6 @@ def select(sql):
         result['data'] = ex
         result['count'] = 0
     finally:
-        close()
         return result
 
 
@@ -70,7 +73,6 @@ def insert(sql):
             cursor.execute(sql_info.strip())
 
         db_result = cursor.rowcount
-        commit()
 
         if db_result > 0:
             result['result'] = 'success'
@@ -82,7 +84,8 @@ def insert(sql):
         result['data'] = ex
         result['count'] = 0
     finally:
-        close()
+        if result['result'] == 'fail':
+            rollback()
         return result
 
 
@@ -101,7 +104,6 @@ def update(sql):
             cursor.execute(sql_info.strip())
 
         db_result = cursor.rowcount
-        commit()
 
         if db_result > 0:
             result['result'] = 'success'
@@ -113,7 +115,8 @@ def update(sql):
         result['data'] = ex
         result['count'] = 0
     finally:
-        close()
+        if result['result'] == 'fail':
+            rollback()
         return result
 
 
@@ -132,7 +135,6 @@ def delete(sql):
             cursor.execute(sql_info.strip())
 
         db_result = cursor.rowcount
-        commit()
 
         if db_result > 0:
             result['result'] = 'success'
@@ -144,5 +146,6 @@ def delete(sql):
         result['data'] = ex
         result['count'] = 0
     finally:
-        close()
+        if result['result'] == 'fail':
+            rollback()
         return result
